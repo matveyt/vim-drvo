@@ -1,0 +1,154 @@
+*drvo.txt*	Yet another directory viewer
+
+==============================================================================
+CONTENTS						*drvo* *drvo-contents*
+  1. Introduction.................................................|drvo-intro|
+  2. Configuration...............................................|drvo-config|
+  3. Commands..................................................|drvo-commands|
+  4. Mappings..................................................|drvo-mappings|
+  5. Functions................................................|drvo-functions|
+
+==============================================================================
+*INTRODUCTION*							  *drvo-intro*
+
+Drvo is a minimalist directory viewer heavily inspired by Dirvish. Basically
+it is just a buffer containing a file names list coated with a few sugary
+mappings.
+
+Drvo started as my personal "toy" project to drop-and-replace Dirvish in my
+Vim configuration, as I got frustrated by its bugs and limitations.
+
+To start using Drvo try to edit any directory: >
+  :edit .
+
+An example mapping to invoke Drvo for the current buffer's directory: >
+  :nnoremap <silent><BS> :edit %:p:h<CR>
+>
+Use any standard Vim command to close Drvo buffer: |ZZ|, |:quit| etc.
+
+==============================================================================
+CONFIGURATION							 *drvo-config*
+
+The following items can be useful for configuring Drvo:
+
+								   *drvo-User*
+autocmd User drvo~
+
+This autocommand is triggered each time the plugin's buffer was read in.
+You're free to do anything with the buffer, including sorting, filtering etc.
+If no such autocommand exists, the plugin provides a default sorting procedure
+of its own.
+
+								*g:drvo_glyph*
+Concealed chars~
+
+If the List `g:drvo_glyph` exists, it is used when concealing files and
+directories paths. An arguably useful example for GUI: >
+  let g:drvo_glyph = [0x1F4C2, 0x1F4C4]
+<
+							       *w:drvo_altbuf*
+Alternate buffer~
+
+When traveling directory tree a lot, an |alternate-file| in the plugin's
+window gets lost very quickly. To deal with this Drvo tracks "the last known
+good" buffer in a dedicated |window-variable| called |w:drvo_altbuf|. A
+|:map-local| remapped <C-^> combo makes use of it whenever possible. Normally,
+you don't need to tackle with this, but you're free to read and modify
+|w:drvo_altbuf| as you wish.
+
+==============================================================================
+COMMANDS						       *drvo-commands*
+
+There is a single buffer-local command |:command-buffer|, named |:Shdo|
+to dump selected file names (or |arglist|) into a new buffer.
+
+:Shdo [fmt]							       *:Shdo*
+
+  Creates a new buffer/window and dumps |arglist| into it with each line
+  formatted according to [fmt]. The only substitution allowed in [fmt]:
+  `{`|filename-modifiers|`}` stands for the current list item. The default for
+  [fmt] is `{:.:S}`
+
+:{range}Shdo [fmt]
+
+  Same as previous version, but dumps line |:range| instead of |arglist|.
+
+Note: The plugin doesn't provide any additional support for executing that
+buffer contents on-the-fly. It's upon you to develop such functionality
+yourself or to use some 3rd party plugin.
+
+==============================================================================
+MAPPINGS						       *drvo-mappings*
+
+All mappings are buffer-local (`filetype=drvo`) and can be disabled by defining
+a global variable |no_plugin_maps| (or `no_drvo_maps`).
+
+g?              Show this help
+<2-LeftMouse> or
+<CR>		Open file or directory at cursor
+I or {Visual}I	Split left and open selected file(s)
+A or {Visual}A	The same as above, but split right
+O or {Visual}O	The same as above, but split above
+o or {Visual}o	The same as above, but split below
+[count]<BS>	Go [count] levels up by the directory tree
+[count]<C-^>	Works as "normal" |Ctrl-^| but prefers |w:drvo_altbuf| if set
+<C-D>		Show "Change drive" dialog {only available on MS-Windows}
+<C-L>		Reload buffer (same as `:edit<CR>`)
+[count]<C-G> or
+{Visual}<C-G>	Show selected file(s) info
+[count]<Space> or
+{Visual}<Space>	Toggle selected item(s) in |arglist|
+D		Clear |arglist| and corresponding |syntax| marks
+<kMultiply>	Toggle all items in |arglist|
++ or <kPlus>	Show "Select files" dialog
+- or <kMinus>	Show "Deselect files" dialog
+
+==============================================================================
+*FUNCTIONS*						      *drvo-functions*
+
+For reference, here is the list of all |autoload| functions the plugin
+provides:
+
+drvo#change_drive()					 *drvo#change_drive()*
+
+  Show "Change drive" dialog {only available on MS-Windows} Note: Uses
+  |+popupwin| if available; otherwise uses |confirm()|.
+
+drvo#fileinfo({items})					     *drvo#fileinfo()*
+
+  Show various information on file(s) from {items} List.
+
+drvo#getline({lnum})					      *drvo#getline()*
+
+  Get item simplified |simplify()| and with a trailing slash removed.
+
+drvo#items({lnum}, {end})					*drvo#items()*
+
+  Get List of raw items from {lnum} to {end}, but also filter out ".", ".."
+  and such.
+
+drvo#mark()							 *drvo#mark()*
+
+  Internal function to refresh |syntax| marks from the current |arglist|.
+
+drvo#reload()						       *drvo#reload()*
+
+  Internal function to read directory contents.
+
+drvo#sel_mask({add})					     *drvo#sel_mask()*
+
+  Show "Select/Deselect files" dialog. Note: it's a very thin wrapper over
+  |:argadd| and |:argdelete|, so be careful!
+
+drvo#sel_toggle({items})				   *drvo#sel_toggle()*
+
+  "Xor" |arglist| with new {items} List. Note: all names in {items} List must
+  be fully expanded first.
+
+drvo#shdo({fmt}, {dir}, {items})				 *drvo#shdo()*
+
+  Implements |:Shdo| command. {fmt} is the same as in |:Shdo|. {dir} is the
+  new local directory |:lcd| to set. {items} is the file name List to dump
+  (if it's |empty()| then |arglist| is used instead).
+
+vim:tw=78:ts=8:ft=help:norl:
