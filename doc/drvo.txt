@@ -20,10 +20,10 @@ Vim configuration, as I got frustrated by its bugs and limitations.
 
 To start using Drvo try to edit any directory: >
   :edit .
-
+<
 An example mapping to invoke Drvo for the current buffer's directory: >
   :nnoremap <silent><BS> :edit %:p:h<CR>
->
+<
 Use any standard Vim command to close Drvo buffer: |ZZ|, |:quit| etc.
 
 ==============================================================================
@@ -67,7 +67,7 @@ to dump selected file names (or |arglist|) into a new buffer.
   Creates a new buffer/window and dumps |arglist| into it with each line
   formatted according to [fmt]. The only substitution allowed in [fmt]:
   `{`|filename-modifiers|`}` stands for the current list item. The default for
-  [fmt] is `{:.:S}`
+  [fmt] is `{:~:.:S}`
 
 :{range}Shdo [fmt]
 
@@ -96,6 +96,8 @@ o or {Visual}o	The same as above, but split below
 <C-L>		Reload buffer (same as `:edit<CR>`)
 [count]<C-G> or
 {Visual}<C-G>	Show selected file(s) info
+[count]! or
+{Visual}!	Start editing shell command for selected item(s)
 [count]<Space> or
 {Visual}<Space>	Toggle selected item(s) in |arglist|
 D		Clear |arglist| and corresponding |syntax| marks

@@ -52,6 +52,12 @@ if !exists('g:no_plugin_maps') && !exists('g:no_drvo_maps')
         \ :<C-U>call drvo#fileinfo(drvo#items('.', line('.') + v:count1 - 1))<CR>
     xnoremap <buffer><silent><C-G> :<C-U>call drvo#fileinfo(drvo#items("'<", "'>"))<CR>
 
+    " ! to compose shell command
+    nnoremap <buffer>! :\<C-U><Space><C-R>=join(map(drvo#items('.',
+        \ line('.') + v:count1 - 1), 'fnamemodify(v:val, ":~:.:S")'))<CR><C-B>!
+    xnoremap <buffer>! :\<C-U><Space><C-R>=join(map(drvo#items("'<", "'>"),
+        \ 'fnamemodify(v:val, ":~:.:S")'))<CR><C-B>!
+
     " <Space> to toggle items in the arglist
     nnoremap <buffer><silent><Space>
         \ :<C-U>call drvo#sel_toggle(drvo#items('.', line('.') + v:count1 - 1))

@@ -171,7 +171,7 @@ function! drvo#shdo(fmt, dir, items) abort
     call setline(1, '#!/bin/sh')
     for l:item in (empty(a:items) ? argv() : a:items)
         call append('$', substitute(a:fmt, '{\([^}]*\)}',
-            \ '\=fnamemodify(l:item, empty(submatch(1)) ? ":.:S" : submatch(1))', 'g'))
+            \ '\=fnamemodify(l:item, empty(submatch(1)) ? ":~:.:S" : submatch(1))', 'g'))
     endfor
 endfunction
 

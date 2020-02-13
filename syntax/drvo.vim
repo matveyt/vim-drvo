@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language:     vim-drvo plugin
 " Maintainer:   matveyt
-" Last Change:  2020 Feb 12
+" Last Change:  2020 Feb 13
 " License:      VIM License
 " URL:          https://github.com/matveyt/vim-drvo
 
@@ -18,17 +18,14 @@ function! drvo#mark() abort
     "BUG: Neovim has always :set nofileignorecase
     let l:case = &fileignorecase || has('win32') ? '\c' : '\C'
     syntax clear drvoMark
-    for l:name in argv()
+    for l:name in map(argv(), {_, v -> fnamemodify(v, ':p')})
         let l:tail = fnamemodify(l:name, ':t')
-        let l:head = fnamemodify(l:name, ':p:h')
-        if empty(l:tail)
+        let l:head = fnamemodify(l:name, ':h')
+        let l:isdir = empty(l:tail)
+        if l:isdir
             " this is a directory: break one level more
             let l:tail = fnamemodify(l:head, ':t')
             let l:head = fnamemodify(l:head, ':h')
-            let l:isdir = v:true
-        else
-            " just a file
-            let l:isdir = v:false
         endif
         " make sure our head ends in a slash
         let l:head = fnamemodify(l:head, ':p')
