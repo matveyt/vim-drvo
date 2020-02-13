@@ -97,7 +97,7 @@ o or {Visual}o	The same as above, but split below
 [count]<C-G> or
 {Visual}<C-G>	Show selected file(s) info
 [count]! or
-{Visual}!	Start editing shell command for selected item(s)
+{Visual}!	Edit shell command |:!cmd| with selected item(s) or |arglist|
 [count]<Space> or
 {Visual}<Space>	Toggle selected item(s) in |arglist|
 D		Clear |arglist| and corresponding |syntax| marks
