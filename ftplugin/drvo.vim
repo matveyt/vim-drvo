@@ -1,7 +1,7 @@
 " Vim filetype file
 " Language:     vim-drvo plugin
 " Maintainer:   matveyt
-" Last Change:  2020 Feb 13
+" Last Change:  2020 Feb 14
 " License:      VIM License
 " URL:          https://github.com/matveyt/vim-drvo
 
@@ -53,9 +53,8 @@ if !exists('g:no_plugin_maps') && !exists('g:no_drvo_maps')
     xnoremap <buffer><silent><C-G> :<C-U>call drvo#fileinfo(drvo#items("'<", "'>"))<CR>
 
     " ! to compose shell command
-    nnoremap <buffer>! :\<C-U><Space><C-R>=join(map(!v:count && argc() ? argv() :
-        \ drvo#items('.', line('.') + v:count1 - 1),
-        \ 'fnamemodify(v:val, ":~:.:S")'))<CR><C-B>!
+    nnoremap <buffer>! :\<C-U><Space><C-R>=join(map(drvo#items('.', line('.') +
+        \ v:count1 - 1), 'fnamemodify(v:val, ":~:.:S")'))<CR><C-B>!
     xnoremap <buffer>! :\<C-U><Space><C-R>=join(map(drvo#items("'<", "'>"),
         \ 'fnamemodify(v:val, ":~:.:S")'))<CR><C-B>!
 

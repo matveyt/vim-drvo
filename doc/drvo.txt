@@ -97,7 +97,8 @@ o or {Visual}o	The same as above, but split below
 [count]<C-G> or
 {Visual}<C-G>	Show selected file(s) info
 [count]! or
-{Visual}!	Edit shell command |:!cmd| with selected item(s) or |arglist|
+{Visual}!	Edit shell command |:!cmd| with selected item(s)
+		Hint: use double hash |c_##| to refer to |arglist|
 [count]<Space> or
 {Visual}<Space>	Toggle selected item(s) in |arglist|
 D		Clear |arglist| and corresponding |syntax| marks
