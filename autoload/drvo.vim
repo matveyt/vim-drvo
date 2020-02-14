@@ -99,31 +99,27 @@ function! drvo#items(lnum, end) abort
     return filter(getline(a:lnum, a:end), {_, v -> v !~# '\([\/]\)\.\+\1$'})
 endfunction
 
-" Reload plugin's buffer
-function! drvo#reload() abort
-    " remember altbuf if it's a regular one
-    let l:altbuf = bufnr('#')
-    if l:altbuf != -1 && buflisted(l:altbuf) &&
-        \ getbufvar(l:altbuf, '&filetype') isnot# 'drvo'
-            let w:drvo_altbuf = l:altbuf
-    endif
-    " read in directory contents
-    let l:dir = fnamemodify(@%, ':p')
-    let l:files = map(glob(l:dir..'.?*', 0, 1) + glob(l:dir..'*', 0, 1),
-        \ {_, f -> isdirectory(f) ? f..l:dir[-1:] : f})
-    silent call deletebufline('%', 1, '$')
-    call setline(1, l:files)
-    " apply sorting, filtering etc.
-    if exists('#User#drvo')
-        doautocmd <nomodeline> User drvo
-    else
-        "BUG: Neovim has always :set nofileignorecase
-        let l:case = &fileignorecase || has('win32') ? 'i' : ''
-        " sort directories first; then sort files by extension
-        execute 'sort' l:case '/^.*[\/]/'
-        execute 'sort' l:case '/\.[^.\/]\+$/r'
-    endif
-    call search('\V\C' . escape(@#, '\'), 'c')
+" Refresh our syntax to match argument list
+function! drvo#mark() abort
+    "BUG: Neovim has always :set nofileignorecase
+    let l:case = &fileignorecase || has('win32') ? '\c' : '\C'
+    syntax clear drvoMark
+    for l:name in map(argv(), {_, v -> fnamemodify(v, ':p')})
+        let l:tail = fnamemodify(l:name, ':t')
+        let l:head = fnamemodify(l:name, ':h')
+        let l:isdir = empty(l:tail)
+        if l:isdir
+            " this is a directory: break one level more
+            let l:tail = fnamemodify(l:head, ':t')
+            let l:head = fnamemodify(l:head, ':h')
+        endif
+        " make sure our head ends in a slash
+        let l:head = fnamemodify(l:head, ':p')
+        " match tail if preceded by head and followed by slash (for dirs)
+        execute printf('syntax match drvoMark %s/\V%s\%%(\^%s\)\@%d<=%s%s\$/ contained',
+            \ l:isdir ? 'nextgroup=drvoLastSlash ' : '', l:case, escape(l:head, '\/'),
+            \ strlen(l:head), l:tail, l:isdir ? '\ze\[\/]' : '')
+    endfor
 endfunction
 
 " Select files dialog

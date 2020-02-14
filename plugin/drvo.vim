@@ -18,13 +18,40 @@ augroup FileExplorer | au!
     autocmd BufNew *
         \ if isdirectory(expand('<afile>')) |
         \     execute 'autocmd! BufReadCmd <buffer=abuf>'
-        \         'call drvo#reload() | setf drvo' |
+        \         'call s:reload() | setf drvo' |
         \ endif
     autocmd BufFilePost,ShellCmdPost *
-        \ if &ft is# 'drvo' | call drvo#reload() | endif
+        \ if &ft is# 'drvo' | call s:reload() | endif
     autocmd DirChanged global,tabpage,window ++nested
         \ if &ft is# 'drvo' | execute 'edit' getcwd() | endif
 augroup end
+
+function s:reload() abort
+    " remember altbuf if it's a regular one
+    let l:altbuf = bufnr('#')
+    if l:altbuf != -1 && buflisted(l:altbuf) &&
+        \ getbufvar(l:altbuf, '&filetype') isnot# 'drvo'
+            let w:drvo_altbuf = l:altbuf
+    endif
+    " read in directory contents
+    let l:dir = fnamemodify(@%, ':p')
+    let l:files = map(glob(l:dir..'.?*', 0, 1) + glob(l:dir..'*', 0, 1),
+        \ {_, f -> isdirectory(f) ? f..l:dir[-1:] : f})
+    silent call deletebufline('%', 1, '$')
+    call setline(1, l:files)
+    " apply sorting, filtering etc.
+    if exists('#User#drvo')
+        doautocmd <nomodeline> User drvo
+    else
+        "BUG: Neovim has always :set nofileignorecase
+        let l:case = &fileignorecase || has('win32') ? 'i' : ''
+        " sort directories first; then sort files by extension
+        execute 'sort' l:case '/^.*[\/]/'
+        execute 'sort' l:case '/\.[^.\/]\+$/r'
+    endif
+    " move cursor to the previous buffer's name
+    call search('\V\C' . escape(@#, '\'), 'c')
+endfunction
 
 let &cpo = s:save_cpo
 unlet s:save_cpo

@@ -134,10 +134,6 @@ drvo#mark()							 *drvo#mark()*
 
   Internal function to refresh |syntax| marks from the current |arglist|.
 
-drvo#reload()						       *drvo#reload()*
-
-  Internal function to read directory contents.
-
 drvo#sel_mask({add})					     *drvo#sel_mask()*
 
   Show "Select/Deselect files" dialog. Note: it's a very thin wrapper over
