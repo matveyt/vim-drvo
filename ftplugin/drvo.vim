@@ -26,7 +26,7 @@ setlocal concealcursor=n conceallevel=2 cursorline nolist nospell nowrap
 " create shell script with names from Visual selection (or arglist)
 command! -buffer -range -nargs=? -complete=shellcmd Shdo
     \ call drvo#shdo(empty(<q-args>) ? '{}' : <q-args>, fnameescape(@%),
-        \ <range> ? drvo#items(<line1>, <line2>) : v:null)
+        \ <range> ? drvo#items(<line1>, <line2>) : v:none)
 
 " local mappings (see :h no_plugin_maps)
 if !exists('g:no_plugin_maps') && !exists('g:no_drvo_maps')
@@ -48,8 +48,8 @@ if !exists('g:no_plugin_maps') && !exists('g:no_drvo_maps')
     " <C-L> to reload directory
     nnoremap <buffer><silent><C-L> :edit<CR>
     " <C-G> to show file(s) size/time/permissions etc.
-    nnoremap <buffer><silent><C-G>
-        \ :<C-U>call drvo#fileinfo(drvo#items('.', line('.') + v:count1 - 1))<CR>
+    nnoremap <buffer><silent><C-G> :<C-U>call drvo#fileinfo(drvo#items('.', line('.') +
+        \ v:count1 - 1))<CR>
     xnoremap <buffer><silent><C-G> :<C-U>call drvo#fileinfo(drvo#items("'<", "'>"))<CR>
 
     " ! to compose shell command

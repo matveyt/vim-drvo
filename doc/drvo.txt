@@ -11,12 +11,12 @@ CONTENTS						*drvo* *drvo-contents*
 ==============================================================================
 *INTRODUCTION*							  *drvo-intro*
 
-Drvo is a minimalist directory viewer heavily inspired by Dirvish. Basically
+Drvo is a minimalist directory viewer heavily inspired by Dirvish. Basically,
 it is just a buffer containing a file names list coated with a few sugary
 mappings.
 
 Drvo started as my personal "toy" project to drop-and-replace Dirvish in my
-Vim configuration, as I got frustrated by its bugs and limitations.
+Vim configuration.
 
 To start using Drvo try to edit any directory: >
   :edit .
@@ -141,7 +141,7 @@ drvo#reload()						       *drvo#reload()*
 drvo#sel_mask({add})					     *drvo#sel_mask()*
 
   Show "Select/Deselect files" dialog. Note: it's a very thin wrapper over
-  |:argadd| and |:argdelete|, so be careful!
+  |:argadd| and |:argdelete|, so be wary!
 
 drvo#sel_toggle({items})				   *drvo#sel_toggle()*
 

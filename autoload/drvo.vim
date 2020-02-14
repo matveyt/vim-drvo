@@ -1,6 +1,6 @@
 " Vim drvo plugin
 " Maintainer:   matveyt
-" Last Change:  2020 Feb 13
+" Last Change:  2020 Feb 14
 " License:      VIM License
 " URL:          https://github.com/matveyt/vim-drvo
 
@@ -144,11 +144,10 @@ endfunction
 " Xor arglist with another {items} List
 " Note: List of {items} must be fully expanded
 function! drvo#sel_toggle(items) abort
-    " expand names in arglist
+    " expand all names in arglist
     let l:argv = map(argv(), {_, v -> fnamemodify(v, ':p')})
     for l:item in a:items
         let l:idx = index(l:argv, l:item)
-        " add or delete item
         if l:idx == -1
             execute '$argadd' fnameescape(l:item)
         else
@@ -156,7 +155,6 @@ function! drvo#sel_toggle(items) abort
             call remove(l:argv, l:idx)
         endif
     endfor
-    " refresh syntax
     call drvo#mark()
 endfunction
 
@@ -167,7 +165,7 @@ endfunction
 "     {items} is List of file names, or empty to use arglist instead
 function! drvo#shdo(fmt, dir, items) abort
     new +set\ ft=sh
-    silent execute 'lcd' a:dir
+    silent! execute 'lcd' a:dir
     call setline(1, '#!/bin/sh')
     for l:item in (empty(a:items) ? argv() : a:items)
         call append('$', substitute(a:fmt, '{\([^}]*\)}',
