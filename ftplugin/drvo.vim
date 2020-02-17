@@ -54,9 +54,9 @@ if !exists('g:no_plugin_maps') && !exists('g:no_drvo_maps')
 
     " ! to compose shell command
     nnoremap <buffer>! :\<C-U><Space><C-R>=join(map(drvo#items('.', line('.') +
-        \ v:count1 - 1), 'fnamemodify(v:val, ":~:.:S")'))<CR><C-B>!
+        \ v:count1 - 1), 'fnamemodify(v:val, ":.:S")'))<CR><C-B>!
     xnoremap <buffer>! :\<C-U><Space><C-R>=join(map(drvo#items("'<", "'>"),
-        \ 'fnamemodify(v:val, ":~:.:S")'))<CR><C-B>!
+        \ 'fnamemodify(v:val, ":.:S")'))<CR><C-B>!
 
     " <Space> to toggle items in the arglist
     nnoremap <buffer><silent><Space>

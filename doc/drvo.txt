@@ -67,7 +67,7 @@ to dump selected file names (or |arglist|) into a new buffer.
   Creates a new buffer/window and dumps |arglist| into it with each line
   formatted according to [fmt]. The only substitution allowed in [fmt]:
   `{`|filename-modifiers|`}` stands for the current list item. The default for
-  [fmt] is `{:~:.:S}`
+  [fmt] is `{:.:S}`
 
 :{range}Shdo [fmt]
 

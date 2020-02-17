@@ -1,6 +1,6 @@
 " Vim drvo plugin
 " Maintainer:   matveyt
-" Last Change:  2020 Feb 14
+" Last Change:  2020 Feb 16
 " License:      VIM License
 " URL:          https://github.com/matveyt/vim-drvo
 
@@ -165,7 +165,7 @@ function! drvo#shdo(fmt, dir, items) abort
     call setline(1, '#!/bin/sh')
     for l:item in (empty(a:items) ? argv() : a:items)
         call append('$', substitute(a:fmt, '{\([^}]*\)}',
-            \ '\=fnamemodify(l:item, empty(submatch(1)) ? ":~:.:S" : submatch(1))', 'g'))
+            \ '\=fnamemodify(l:item, empty(submatch(1)) ? ":.:S" : submatch(1))', 'g'))
     endfor
 endfunction
 
