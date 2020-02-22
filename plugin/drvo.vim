@@ -1,6 +1,6 @@
 " Vim drvo plugin
 " Maintainer:   matveyt
-" Last Change:  2020 Feb 14
+" Last Change:  2020 Feb 18
 " License:      VIM License
 " URL:          https://github.com/matveyt/vim-drvo
 
@@ -23,7 +23,7 @@ augroup FileExplorer | au!
     autocmd BufFilePost,ShellCmdPost *
         \ if &ft is# 'drvo' | call s:reload() | endif
     autocmd DirChanged global,tabpage,window ++nested
-        \ if &ft is# 'drvo' | execute 'edit' getcwd() | endif
+        \ if &ft is# 'drvo' | execute 'edit' fnameescape(getcwd()) | endif
 augroup end
 
 function s:reload() abort

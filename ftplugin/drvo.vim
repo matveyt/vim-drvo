@@ -1,7 +1,7 @@
 " Vim filetype file
 " Language:     vim-drvo plugin
 " Maintainer:   matveyt
-" Last Change:  2020 Feb 14
+" Last Change:  2020 Feb 22
 " License:      VIM License
 " URL:          https://github.com/matveyt/vim-drvo
 
@@ -25,7 +25,7 @@ setlocal concealcursor=n conceallevel=2 cursorline nolist nospell nowrap
 
 " create shell script with names from Visual selection (or arglist)
 command! -buffer -range -nargs=? -complete=shellcmd Shdo
-    \ call drvo#shdo(empty(<q-args>) ? '{}' : <q-args>, fnameescape(@%),
+    \ call drvo#shdo(empty(<q-args>) ? '{}' : <q-args>, @%,
         \ <range> ? drvo#items(<line1>, <line2>) : v:none)
 
 " local mappings (see :h no_plugin_maps)
@@ -54,9 +54,9 @@ if !exists('g:no_plugin_maps') && !exists('g:no_drvo_maps')
 
     " ! to compose shell command
     nnoremap <buffer>! :\<C-U><Space><C-R>=join(map(drvo#items('.', line('.') +
-        \ v:count1 - 1), 'fnamemodify(v:val, ":.:S")'))<CR><C-B>!
+        \ v:count1 - 1), 'drvo#forbang(v:val)'))<CR><C-B>!
     xnoremap <buffer>! :\<C-U><Space><C-R>=join(map(drvo#items("'<", "'>"),
-        \ 'fnamemodify(v:val, ":.:S")'))<CR><C-B>!
+        \ 'drvo#forbang(v:val)'))<CR><C-B>!
 
     " <Space> to toggle items in the arglist
     nnoremap <buffer><silent><Space>

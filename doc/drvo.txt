@@ -121,13 +121,18 @@ drvo#fileinfo({items})					     *drvo#fileinfo()*
 
   Show various information on file(s) from {items} List.
 
+drvo#forbang({fname})					      *drvo#forbang()*
+
+  Prepare {fname} for passing to |:!cmd|
+
 drvo#getline({lnum})					      *drvo#getline()*
 
-  Get item simplified |simplify()| and with a trailing slash removed.
+  Get "cooked" item: |simplify()|, |fnameescape()| and with a trailing slash
+  removed.
 
 drvo#items({lnum}, {end})					*drvo#items()*
 
-  Get List of raw items from {lnum} to {end}, but also filter out ".", ".."
+  Get List of "raw" items from {lnum} to {end}, but also filter out ".", ".."
   and such.
 
 drvo#mark()							 *drvo#mark()*

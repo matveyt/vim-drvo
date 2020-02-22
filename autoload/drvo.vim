@@ -1,6 +1,6 @@
 " Vim drvo plugin
 " Maintainer:   matveyt
-" Last Change:  2020 Feb 16
+" Last Change:  2020 Feb 22
 " License:      VIM License
 " URL:          https://github.com/matveyt/vim-drvo
 
@@ -53,7 +53,7 @@ function s:get_drives() abort
     return l:result
 endfunction
 
-" Implements 'Change drive' dialog on MS-Windows.
+" Implements 'Change drive' dialog on MS-Windows
 function! drvo#change_drive() abort
     let l:drives = s:get_drives()
     if !empty(l:drives)
@@ -77,7 +77,7 @@ function! drvo#change_drive() abort
     endif
 endfunction
 
-" Print misc file info
+" Print misc. file info
 function! drvo#fileinfo(items) abort
     for l:item in a:items
         let l:item = s:chomp(l:item)
@@ -89,12 +89,26 @@ function! drvo#fileinfo(items) abort
     endfor
 endfunction
 
-" Get item simplified
-function! drvo#getline(lnum) abort
-    return simplify(s:chomp(getline(a:lnum)))
+" drvo#forbang(fname)
+" Prepare file name for passing to :!cmd, while making sure that
+" an absolute path start with the drive letter under Windows
+" (not to confuse MSYS/Cygwin)
+function! drvo#forbang(fname) abort
+    " try to shorten path
+    let l:fname = fnamemodify(a:fname, ':~:.')
+    if has('win32') && l:fname =~# '^[\/]'
+        " force drive letter under Windows
+        let l:fname = fnamemodify(a:fname, ':p')
+    endif
+    return shellescape(l:fname, v:true)
 endfunction
 
-" Get raw items [lnum..end] filtering out '..' and such
+" Get "cooked" item
+function! drvo#getline(lnum) abort
+    return fnameescape(simplify(s:chomp(getline(a:lnum))))
+endfunction
+
+" Get "raw" items [lnum..end] filtering out '..' and such
 function! drvo#items(lnum, end) abort
     return filter(getline(a:lnum, a:end), {_, v -> v !~# '\([\/]\)\.\+\1$'})
 endfunction
@@ -161,8 +175,9 @@ endfunction
 "     {items} is List of file names, or empty to use arglist instead
 function! drvo#shdo(fmt, dir, items) abort
     new +set\ ft=sh
-    silent! execute 'lcd' a:dir
+    silent! execute 'lcd' fnameescape(a:dir)
     call setline(1, '#!/bin/sh')
+    call setline(2, 'cd ' . shellescape(getcwd()))
     for l:item in (empty(a:items) ? argv() : a:items)
         call append('$', substitute(a:fmt, '{\([^}]*\)}',
             \ '\=fnamemodify(l:item, empty(submatch(1)) ? ":.:S" : submatch(1))', 'g'))
