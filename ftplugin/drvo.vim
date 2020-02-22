@@ -14,7 +14,7 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 " force bufname update
-noautocmd lcd .
+silent! noautocmd lcd .
 
 " buffer-local options
 let b:undo_ftplugin = 'setl bt< bh< swf< ul<'
@@ -31,7 +31,7 @@ command! -buffer -range -nargs=? -complete=shellcmd Shdo
 " local mappings (see :h no_plugin_maps)
 if !exists('g:no_plugin_maps') && !exists('g:no_drvo_maps')
     " g? to show help
-    nnoremap <buffer><silent>g? :help drvo-mappings<CR>
+    nnoremap <buffer><silent>g? :help! drvo-mappings<CR>
 
     " <CR> and <2-LeftMouse> to change directory/open file
     nnoremap <buffer><expr><silent><CR> ':edit ' . drvo#getline('.') . "\<CR>"

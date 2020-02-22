@@ -7,7 +7,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-" Remove trailing slash if any
+" Remove trailing slash
 function s:chomp(name)
     return a:name !~# '[\/]$' ? a:name : a:name[:-2]
 endfunction
@@ -24,14 +24,14 @@ function s:fsize2str(size) abort
         return a:size
     else
         " divide by 2^10 while possible
-        let [l:num, l:frac, l:pow] = [a:size, 0, 0]
+        let [l:num, l:frac, l:pow] = [a:size, 0, -1]
         while l:num >= 1024
             let [l:num, l:frac] = [l:num / 1024, l:num % 1024]
             let l:pow += 1
         endwhile
         let l:frac = (l:frac > 102) ? '.'..(l:frac * 10 / 1024) : ''
         " 'traditional' binary prefix
-        return l:num..l:frac..strpart('KMGTPEZY', l:pow - 1, 1)
+        return l:num..l:frac..strpart('KMGTPEZY', l:pow, 1)
     endif
 endfunction
 
@@ -46,8 +46,8 @@ function s:get_drives() abort
                 " the drive exists
                 call add(l:result, nr2char(l:letter)..':')
             endif
-            let l:mask /= 2
             let l:letter += 1
+            let l:mask /= 2
         endwhile
     endif
     return l:result
@@ -63,8 +63,8 @@ function! drvo#change_drive() abort
                 "BUG: Neovim cannot fnamemodify('C:', ':p:h')
                 let l:dir = has('nvim') ? l:drives[a:result - 1]..'/' :
                     \ fnamemodify(l:drives[a:result - 1], ':p:h')
-                " 'cd' to new dir
-                execute 'edit' l:dir
+                " cd to new dir
+                execute 'edit' fnameescape(l:dir)
             endif
         endfunction
         " execute dialog
@@ -89,15 +89,12 @@ function! drvo#fileinfo(items) abort
     endfor
 endfunction
 
-" drvo#forbang(fname)
-" Prepare file name for passing to :!cmd, while making sure that
-" an absolute path start with the drive letter under Windows
-" (not to confuse MSYS/Cygwin)
+" Prepare file name for passing to :!cmd
 function! drvo#forbang(fname) abort
-    " try to shorten path
+    " relative path?
     let l:fname = fnamemodify(a:fname, ':~:.')
     if has('win32') && l:fname =~# '^[\/]'
-        " force drive letter under Windows
+        " force drive letter under Windows not to confuse MSYS/Cygwin etc.
         let l:fname = fnamemodify(a:fname, ':p')
     endif
     return shellescape(l:fname, v:true)
@@ -113,7 +110,7 @@ function! drvo#items(lnum, end) abort
     return filter(getline(a:lnum, a:end), {_, v -> v !~# '\([\/]\)\.\+\1$'})
 endfunction
 
-" Refresh our syntax to match argument list
+" Make syntax to match arglist
 function! drvo#mark() abort
     "BUG: Neovim has always :set nofileignorecase
     let l:case = &fileignorecase || has('win32') ? '\c' : '\C'
@@ -123,7 +120,7 @@ function! drvo#mark() abort
         let l:head = fnamemodify(l:name, ':h')
         let l:isdir = empty(l:tail)
         if l:isdir
-            " this is a directory: break one level more
+            " this is a directory: go one level deeper
             let l:tail = fnamemodify(l:head, ':t')
             let l:head = fnamemodify(l:head, ':h')
         endif
