@@ -1,7 +1,7 @@
 " Vim drvo plugin
 " Maintainer:   matveyt
-" Last Change:  2020 Feb 18
-" License:      VIM License
+" Last Change:  2020 Feb 25
+" License:      http://unlicense.org
 " URL:          https://github.com/matveyt/vim-drvo
 
 if exists('g:loaded_drvo')
@@ -37,6 +37,15 @@ function s:reload() abort
     let l:dir = fnamemodify(@%, ':p')
     let l:files = map(glob(l:dir..'.?*', 0, 1) + glob(l:dir..'*', 0, 1),
         \ {_, f -> isdirectory(f) ? f..l:dir[-1:] : f})
+    if l:dir ==# fnamemodify(l:dir, ':h')
+        " root directory: filter out '..'
+        call filter(l:files, {_, v -> v !~# '\([\/]\)\.\.\1$'})
+    elseif empty(l:files)
+        " no '..' in a subdirectory: access denied
+        echohl WarningMsg | echo 'Access denied' | echohl None
+        call add(l:files, l:dir..'..'..l:dir[-1:])
+    endif
+    " set new buffer
     silent call deletebufline('%', 1, '$')
     call setline(1, l:files)
     " apply sorting, filtering etc.

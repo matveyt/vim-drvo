@@ -1,7 +1,7 @@
 " Vim drvo plugin
 " Maintainer:   matveyt
-" Last Change:  2020 Feb 22
-" License:      VIM License
+" Last Change:  2020 Feb 25
+" License:      http://unlicense.org
 " URL:          https://github.com/matveyt/vim-drvo
 
 let s:save_cpo = &cpo
@@ -105,9 +105,9 @@ function! drvo#getline(lnum) abort
     return fnameescape(simplify(s:chomp(getline(a:lnum))))
 endfunction
 
-" Get "raw" items [lnum..end] filtering out '..' and such
+" Get "raw" items [lnum..end] filtering out '..'
 function! drvo#items(lnum, end) abort
-    return filter(getline(a:lnum, a:end), {_, v -> v !~# '\([\/]\)\.\+\1$'})
+    return filter(getline(a:lnum, a:end), {_, v -> v !~# '\([\/]\)\.\.\1$'})
 endfunction
 
 " Make syntax to match arglist

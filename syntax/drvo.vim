@@ -1,8 +1,8 @@
 " Vim syntax file
 " Language:     vim-drvo plugin
 " Maintainer:   matveyt
-" Last Change:  2020 Feb 14
-" License:      VIM License
+" Last Change:  2020 Feb 24
+" License:      http://unlicense.org
 " URL:          https://github.com/matveyt/vim-drvo
 
 if exists('b:current_syntax')

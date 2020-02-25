@@ -132,8 +132,7 @@ drvo#getline({lnum})					      *drvo#getline()*
 
 drvo#items({lnum}, {end})					*drvo#items()*
 
-  Get List of "raw" items from {lnum} to {end}, but also filter out ".", ".."
-  and such.
+  Get List of "raw" items from {lnum} to {end}, but also filter out "..".
 
 drvo#mark()							 *drvo#mark()*
 
