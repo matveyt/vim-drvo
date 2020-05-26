@@ -1,7 +1,7 @@
 " Vim filetype file
 " Language:     vim-drvo plugin
 " Maintainer:   matveyt
-" Last Change:  2020 Feb 24
+" Last Change:  2020 May 24
 " License:      http://unlicense.org
 " URL:          https://github.com/matveyt/vim-drvo
 
@@ -34,14 +34,14 @@ if !exists('g:no_plugin_maps') && !exists('g:no_drvo_maps')
     nnoremap <buffer><silent>g? :help! drvo-mappings<CR>
 
     " <CR> and <2-LeftMouse> to change directory/open file
-    nnoremap <buffer><expr><silent><CR> ':edit ' . drvo#getline('.') . "\<CR>"
-    nnoremap <buffer><expr><silent><2-LeftMouse> ':edit ' . drvo#getline('.') . "\<CR>"
+    nnoremap <buffer><expr><silent><CR> ':edit '..drvo#getline('.')..'<CR>'
+    nnoremap <buffer><expr><silent><2-LeftMouse> ':edit '..drvo#getline('.')..'<CR>'
     " <BS> to move up directory tree
     nnoremap <buffer><expr><silent><BS>
-        \ ":\<C-U>edit %" . repeat(':h', v:count1) . "\<CR>"
+        \ ':<C-U>edit %'..repeat(':h', v:count1)..'<CR>'
     " <C-^> to switch to the altbuf (last known good)
     nnoremap <buffer><expr><silent><C-^>
-        \ ":\<C-U>edit #" . (v:count ? v:count : get(w:, 'drvo_altbuf')) . "\<CR>"
+        \ ':<C-U>edit #'..(v:count ? v:count : get(w:, 'drvo_altbuf'))..'<CR>'
 
     " <C-D> to change drive
     nnoremap <buffer><silent><C-D> :call drvo#change_drive()<CR>
@@ -53,9 +53,9 @@ if !exists('g:no_plugin_maps') && !exists('g:no_drvo_maps')
     xnoremap <buffer><silent><C-G> :<C-U>call drvo#fileinfo(drvo#items("'<", "'>"))<CR>
 
     " ! to compose shell command
-    nnoremap <buffer>! :\<C-U><Space><C-R>=join(map(drvo#items('.', line('.') +
+    nnoremap <buffer>! :<C-U><Space><C-R>=join(map(drvo#items('.', line('.') +
         \ v:count1 - 1), 'drvo#forbang(v:val)'))<CR><C-B>!
-    xnoremap <buffer>! :\<C-U><Space><C-R>=join(map(drvo#items("'<", "'>"),
+    xnoremap <buffer>! :<C-U><Space><C-R>=join(map(drvo#items("'<", "'>"),
         \ 'drvo#forbang(v:val)'))<CR><C-B>!
 
     " <Space> to toggle items in the arglist
@@ -77,13 +77,13 @@ if !exists('g:no_plugin_maps') && !exists('g:no_drvo_maps')
 
     " I/A/O/o to open current file/dir on the left/right/above/below
     nnoremap <buffer><expr><silent>I
-        \ ':above vsplit +edit\ ' . drvo#getline('.') . ' <Bar>wincmd p' . "\<CR>"
+        \ ':above vsplit +edit\ '..drvo#getline('.')..' <Bar> wincmd p<CR>'
     nnoremap <buffer><expr><silent>A
-        \ ':below vsplit +edit\ ' . drvo#getline('.') . ' <Bar>wincmd p' . "\<CR>"
+        \ ':below vsplit +edit\ '..drvo#getline('.')..' <Bar> wincmd p<CR>'
     nnoremap <buffer><expr><silent>O
-        \ ':above  split +edit\ ' . drvo#getline('.') . ' <Bar>wincmd p' . "\<CR>"
+        \ ':above  split +edit\ '..drvo#getline('.')..' <Bar> wincmd p<CR>'
     nnoremap <buffer><expr><silent>o
-        \ ':below  split +edit\ ' . drvo#getline('.') . ' <Bar>wincmd p' . "\<CR>"
+        \ ':below  split +edit\ '..drvo#getline('.')..' <Bar> wincmd p<CR>'
     " the same for Visual selection
     xnoremap <buffer><silent>I :normal I<CR>
     xnoremap <buffer><silent>A :normal A<CR>
