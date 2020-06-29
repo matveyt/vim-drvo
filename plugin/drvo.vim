@@ -1,6 +1,6 @@
 " Vim drvo plugin
 " Maintainer:   matveyt
-" Last Change:  2020 Feb 25
+" Last Change:  2020 Jun 27
 " License:      http://unlicense.org
 " URL:          https://github.com/matveyt/vim-drvo
 
@@ -16,14 +16,17 @@ set cpo&vim
 " so netrw-plugin becomes (mostly) disabled
 augroup FileExplorer | au!
     autocmd BufNew *
-        \ if isdirectory(expand('<afile>')) |
-        \     execute 'autocmd! BufReadCmd <buffer=abuf>'
-        \         'call s:reload() | setf drvo' |
-        \ endif
+        \   if isdirectory(expand('<afile>'))
+        \ |     execute 'autocmd! BufReadCmd <buffer=abuf> call s:reload()'
+        \ | endif
     autocmd BufFilePost,ShellCmdPost *
-        \ if &ft is# 'drvo' | call s:reload() | endif
+        \   if &filetype is# 'drvo'
+        \ |     call s:reload()
+        \ | endif
     autocmd DirChanged global,tabpage,window ++nested
-        \ if &ft is# 'drvo' | execute 'edit' fnameescape(getcwd()) | endif
+        \   if &filetype is# 'drvo'
+        \ |     execute 'edit' fnameescape(getcwd())
+        \ | endif
 augroup end
 
 function s:reload() abort
@@ -48,18 +51,8 @@ function s:reload() abort
     " set new buffer
     silent call deletebufline('%', 1, '$')
     call setline(1, l:files)
-    " apply sorting, filtering etc.
-    if exists('#User#drvo')
-        doautocmd <nomodeline> User drvo
-    else
-        "BUG: Neovim has always :set nofileignorecase
-        let l:case = &fileignorecase || has('win32') ? 'i' : ''
-        " sort directories first; then sort files by extension
-        execute 'sort' l:case '/^.*[\/]/'
-        execute 'sort' l:case '/\.[^.\/]\+$/r'
-    endif
-    " move cursor to the previous buffer's name
-    call search('\V\C' . escape(@#, '\'), 'c')
+    " force filetype update
+    setfiletype drvo
 endfunction
 
 let &cpo = s:save_cpo

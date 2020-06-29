@@ -31,14 +31,6 @@ CONFIGURATION							 *drvo-config*
 
 The following items can be useful for configuring Drvo:
 
-								   *drvo-User*
-autocmd User drvo~
-
-This autocommand is triggered each time the plugin's buffer was read in.
-You're free to do anything with the buffer, including sorting, filtering etc.
-If no such autocommand exists, the plugin provides a default sorting procedure
-of its own.
-
 								*g:drvo_glyph*
 Concealed chars~
 
@@ -80,8 +72,7 @@ yourself or to use some 3rd party plugin.
 ==============================================================================
 MAPPINGS						       *drvo-mappings*
 
-All mappings are buffer-local (`filetype=drvo`) and can be disabled by defining
-a global variable |no_plugin_maps| (or `no_drvo_maps`).
+All mappings are buffer-local (`filetype=drvo`).
 
 g?              Show this help
 <2-LeftMouse> or

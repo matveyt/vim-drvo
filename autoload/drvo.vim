@@ -1,6 +1,6 @@
 " Vim drvo plugin
 " Maintainer:   matveyt
-" Last Change:  2020 Feb 25
+" Last Change:  2020 Jun 29
 " License:      http://unlicense.org
 " URL:          https://github.com/matveyt/vim-drvo
 
@@ -171,14 +171,15 @@ endfunction
 "     {dir} is new directory to change to
 "     {items} is List of file names, or empty to use arglist instead
 function! drvo#shdo(fmt, dir, items) abort
-    new +set\ ft=sh
+    new
     silent! execute 'lcd' fnameescape(a:dir)
-    call setline(1, '#!/bin/sh')
-    call setline(2, 'cd ' . shellescape(getcwd()))
+    call setline(1, '#!'..&shell)
+    call setline(2, 'cd '..shellescape(getcwd()))
     for l:item in (empty(a:items) ? argv() : a:items)
         call append('$', substitute(a:fmt, '{\([^}]*\)}',
             \ '\=fnamemodify(l:item, empty(submatch(1)) ? ":.:S" : submatch(1))', 'g'))
     endfor
+    filetype detect
 endfunction
 
 let &cpo = s:save_cpo
