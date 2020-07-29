@@ -1,8 +1,8 @@
 " Vim filetype file
 " Language:     vim-drvo plugin
 " Maintainer:   matveyt
-" Last Change:  2020 Jul 01
-" License:      http://unlicense.org
+" Last Change:  2020 Jul 29
+" License:      https://unlicense.org
 " URL:          https://github.com/matveyt/vim-drvo
 
 if exists('b:did_ftplugin')

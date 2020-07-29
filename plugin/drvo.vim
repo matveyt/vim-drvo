@@ -1,7 +1,7 @@
 " Vim drvo plugin
 " Maintainer:   matveyt
-" Last Change:  2020 Jul 28
-" License:      http://unlicense.org
+" Last Change:  2020 Jul 29
+" License:      https://unlicense.org
 " URL:          https://github.com/matveyt/vim-drvo
 
 if exists('g:loaded_drvo')
