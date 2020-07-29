@@ -1,7 +1,7 @@
 " Vim filetype file
 " Language:     vim-drvo plugin
 " Maintainer:   matveyt
-" Last Change:  2020 Jun 27
+" Last Change:  2020 Jul 01
 " License:      http://unlicense.org
 " URL:          https://github.com/matveyt/vim-drvo
 
@@ -85,17 +85,8 @@ xnoremap <buffer><silent>A :normal A<CR>
 xnoremap <buffer><silent>O :normal O<CR>
 xnoremap <buffer><silent>o :normal o<CR>
 
-" sort directories first; then sort files by extension
-"BUG: Neovim has always :set nofileignorecase
-let s:case = &fileignorecase || has('win32') ? 'i' : ''
-execute 'sort' s:case '/^.*[\/]/'
-execute 'sort' s:case '/\.[^.\/]\+$/r'
-unlet s:case
-
-" force bufname update
-silent! noautocmd lcd .
-" move cursor to the previous buffer's name
-call search('\V\C' . escape(@#, '\'), 'c')
+" sort lines, set cursor etc.
+call drvo#prettify()
 
 let &cpo = s:save_cpo
 unlet s:save_cpo

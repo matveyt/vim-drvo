@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language:     vim-drvo plugin
 " Maintainer:   matveyt
-" Last Change:  2020 Feb 24
+" Last Change:  2020 Jul 01
 " License:      http://unlicense.org
 " URL:          https://github.com/matveyt/vim-drvo
 
@@ -34,12 +34,12 @@ execute 'syntax match drvoFileRoot nextgroup=drvoMark,drvoFileTrunk /^.*[\/]/'
     \ 'contained conceal' s:ccf
 syntax match drvoFileTrunk /.\+/ contained
 
-" reset all marks
-call drvo#mark()
-
 " setup default color groups
 highlight default link drvoDirTrunk Directory
 highlight default link drvoMark Todo
+
+" reset all marks
+call drvo#mark()
 
 let &cpo = s:save_cpo
 unlet s:save_cpo s:ccd s:ccf

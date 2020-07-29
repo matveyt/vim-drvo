@@ -1,6 +1,6 @@
 " Vim drvo plugin
 " Maintainer:   matveyt
-" Last Change:  2020 Jun 29
+" Last Change:  2020 Jul 15
 " License:      http://unlicense.org
 " URL:          https://github.com/matveyt/vim-drvo
 
@@ -8,7 +8,7 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 " Remove trailing slash
-function s:chomp(name)
+function s:chomp(name) abort
     return a:name !~# '[\/]$' ? a:name : a:name[:-2]
 endfunction
 
@@ -53,6 +53,12 @@ function s:get_drives() abort
     return l:result
 endfunction
 
+" Check if case matters in file names
+function s:ignore_case() abort
+    "BUG: Neovim has always :set nofileignorecase
+    return &fileignorecase || has('win32')
+endfunction
+
 " Implements 'Change drive' dialog on MS-Windows
 function! drvo#change_drive() abort
     let l:drives = s:get_drives()
@@ -64,7 +70,7 @@ function! drvo#change_drive() abort
                 let l:dir = has('nvim') ? l:drives[a:result - 1]..'/' :
                     \ fnamemodify(l:drives[a:result - 1], ':p:h')
                 " cd to new dir
-                execute 'edit' fnameescape(l:dir)
+                edit `=fnameescape(l:dir)`
             endif
         endfunction
         " execute dialog
@@ -112,8 +118,7 @@ endfunction
 
 " Make syntax to match arglist
 function! drvo#mark() abort
-    "BUG: Neovim has always :set nofileignorecase
-    let l:case = &fileignorecase || has('win32') ? '\c' : '\C'
+    let l:case = s:ignore_case() ? '\c' : '\C'
     syntax clear drvoMark
     for l:name in map(argv(), {_, v -> fnamemodify(v, ':p')})
         let l:tail = fnamemodify(l:name, ':t')
@@ -131,6 +136,51 @@ function! drvo#mark() abort
             \ l:isdir ? 'nextgroup=drvoLastSlash ' : '', l:case, escape(l:head, '\/'),
             \ strlen(l:head), l:tail, l:isdir ? '\ze\[\/]' : '')
     endfor
+endfunction
+
+" Apply sorting and such
+function! drvo#prettify() abort
+    " force bufname update
+    silent! noautocmd lcd .
+
+    " sort directories first; then sort files by extension
+    let l:case = s:ignore_case() ? 'i' : ''
+    execute 'sort' l:case '/^.*[\/]/'
+    execute 'sort' l:case '/\.[^.\/]\+$/r'
+
+    " remember altbuf if it's a regular one
+    let l:altbuf = bufnr(0)
+    if l:altbuf != -1 && buflisted(l:altbuf) &&
+        \ getbufvar(l:altbuf, '&filetype') isnot# 'drvo'
+        let w:drvo_altbuf = l:altbuf
+    endif
+
+    " move cursor to the previous buffer's name
+    call search('\V\C'..escape(@#, '\'), 'cw')
+endfunction
+
+" Read in our buffer
+function! drvo#readcmd(fmt) abort
+    if a:fmt is# 'dir'
+        " read in directory contents
+        let l:dir = fnamemodify(@%, ':p')
+        let l:lines = map(glob(l:dir..'.?*', 0, 1) + glob(l:dir..'*', 0, 1),
+            \ {_, f -> isdirectory(f) ? f..l:dir[-1:] : f})
+        if l:dir ==# fnamemodify(l:dir, ':h')
+            " root directory: filter out '..'
+            call filter(l:lines, {_, v -> v !~# '\([\/]\)\.\.\1$'})
+        elseif empty(l:lines)
+            " no '..' in a subdirectory: access denied
+            echohl WarningMsg | echo 'Access denied' | echohl None
+            call add(l:lines, l:dir..'..'..l:dir[-1:])
+        endif
+    else
+        "TODO
+    endif
+
+    silent call deletebufline('', 1, '$')
+    call setline(1, l:lines)
+    setfiletype drvo
 endfunction
 
 " Select files dialog
@@ -156,7 +206,7 @@ function! drvo#sel_toggle(items) abort
     for l:item in a:items
         let l:idx = index(l:argv, l:item)
         if l:idx == -1
-            execute '$argadd' fnameescape(l:item)
+            $argadd `=fnameescape(l:item)`
         else
             execute string(l:idx + 1) 'argdelete'
             call remove(l:argv, l:idx)
@@ -172,7 +222,7 @@ endfunction
 "     {items} is List of file names, or empty to use arglist instead
 function! drvo#shdo(fmt, dir, items) abort
     new
-    silent! execute 'lcd' fnameescape(a:dir)
+    silent! lcd `=fnameescape(a:dir)`
     call setline(1, '#!'..&shell)
     call setline(2, 'cd '..shellescape(getcwd()))
     for l:item in (empty(a:items) ? argv() : a:items)
