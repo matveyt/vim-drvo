@@ -145,4 +145,5 @@ drvo#shdo({fmt}, {dir}, {items})				 *drvo#shdo()*
   new local directory |:lcd| to set. {items} is the file name List to dump
   (if it's |empty()| then |arglist| is used instead).
 
-vim:tw=78:ts=8:ft=help:norl:
+==============================================================================
+ vim:tw=78:ts=8:ft=help:norl:

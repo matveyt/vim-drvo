@@ -1,6 +1,6 @@
 " Vim drvo plugin
 " Maintainer:   matveyt
-" Last Change:  2020 Jul 29
+" Last Change:  2020 Jul 30
 " License:      https://unlicense.org
 " URL:          https://github.com/matveyt/vim-drvo
 
@@ -9,7 +9,7 @@ set cpo&vim
 
 " Remove trailing slash
 function s:chomp(name) abort
-    return a:name !~# '[\/]$' ? a:name : a:name[:-2]
+    return a:name =~# '[\/]$' ? a:name[:-2] : a:name
 endfunction
 
 " Convert file size to a printable string
@@ -162,17 +162,22 @@ endfunction
 " Read in our buffer
 function! drvo#readcmd(fmt) abort
     if a:fmt is# 'dir'
-        " read in directory contents
         let l:dir = fnamemodify(@%, ':p')
-        let l:lines = map(glob(l:dir..'.?*', 0, 1) + glob(l:dir..'*', 0, 1),
-            \ {_, f -> isdirectory(f) ? f..l:dir[-1:] : f})
-        if l:dir ==# fnamemodify(l:dir, ':h')
-            " root directory: filter out '..'
-            call filter(l:lines, {_, v -> v !~# '\([\/]\)\.\.\1$'})
-        elseif empty(l:lines)
-            " no '..' in a subdirectory: access denied
-            echohl WarningMsg | echo 'Access denied' | echohl None
-            call add(l:lines, l:dir..'..'..l:dir[-1:])
+        if l:dir =~# '[\/]$'
+            " read in directory contents
+            let l:lines = map(glob(l:dir..'.?*', 0, 1) + glob(l:dir..'*', 0, 1),
+                \ {_, f -> isdirectory(f) ? f..l:dir[-1:] : f})
+            if l:dir is# fnamemodify(l:dir, ':h')
+                " root directory: filter out '..'
+                call filter(l:lines, {_, v -> v !~# '\([\/]\)\.\.\1$'})
+            elseif empty(l:lines)
+                " no '..' in a subdirectory: access denied
+                echohl WarningMsg | echo 'Access denied' | echohl None
+                call add(l:lines, l:dir..'..'..l:dir[-1:])
+            endif
+        else
+            echohl WarningMsg | echo 'Not a directory' | echohl None
+            let l:lines = fnamemodify(getcwd(), ':p')
         endif
     else
         "TODO
@@ -186,7 +191,7 @@ endfunction
 " Select files dialog
 function! drvo#sel_mask(add) abort
     let l:prompt = a:add ? 'Select: ' : 'Deselect: '
-    let l:mask = expand('%:p:h') ==# getcwd() ? '*' : '%:./*'
+    let l:mask = expand('%:p:h') is# getcwd() ? '*' : '%:./*'
     if exists('*inputdialog')
         let l:mask = inputdialog(l:prompt, l:mask)
     else
