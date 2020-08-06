@@ -190,12 +190,12 @@ endfunction
 
 " Select files dialog
 function! drvo#sel_mask(add) abort
-    let l:prompt = a:add ? 'Select: ' : 'Deselect: '
+    let l:prompt = a:add ? 'Select' : 'Deselect'
     let l:mask = expand('%:p:h') is# getcwd() ? '*' : '%:./*'
     if exists('*inputdialog')
         let l:mask = inputdialog(l:prompt, l:mask)
     else
-        let l:mask = input(l:prompt, l:mask, 'file')
+        let l:mask = input(l:prompt..': ', l:mask, 'file')
     endif
     if !empty(l:mask)
         silent! execute (a:add ? '$argadd' : 'argdelete') l:mask
