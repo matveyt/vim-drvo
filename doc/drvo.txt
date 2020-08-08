@@ -83,6 +83,7 @@ O or {Visual}O	The same as above, but split above
 o or {Visual}o	The same as above, but split below
 [count]<BS>	Go [count] levels up by the directory tree
 [count]<C-^>	Works as "normal" |Ctrl-^| but prefers |w:drvo_altbuf| if set
+=		Sync current directory with buffer
 <C-D>		Show "Change drive" dialog {only available on MS-Windows}
 <C-L>		Reload buffer (same as `:edit<CR>`)
 [count]<C-G> or
@@ -128,6 +129,16 @@ drvo#items({lnum}, {end})					*drvo#items()*
 drvo#mark()							 *drvo#mark()*
 
   Internal function to refresh |syntax| marks from the current |arglist|.
+
+drvo#prettify()						     *drvo#prettify()*
+
+  This function is called by drvo |ftplugin| to prepare the buffer for
+  display. It sorts the items, among other things. See |after-directory| if
+  you're not happy with it.
+
+drvo#readcmd({fmt})					      *drvo#readcmd()*
+
+  Internal function to implement |BufReadCmd|.
 
 drvo#sel_mask({add})					     *drvo#sel_mask()*
 
