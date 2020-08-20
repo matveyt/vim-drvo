@@ -65,7 +65,7 @@ to dump selected file names (or |arglist|) into a new buffer.
 
   Same as previous version, but dumps line |:range| instead of |arglist|.
 
-Note: The plugin doesn't provide any additional support for executing that
+Note the plugin doesn't provide any additional support for executing that
 buffer contents on-the-fly. It's upon you to develop such functionality
 yourself or to use some 3rd party plugin.
 
@@ -75,25 +75,22 @@ MAPPINGS						       *drvo-mappings*
 All mappings are buffer-local (`filetype=drvo`).
 
 g?              Show this help
-<2-LeftMouse> or
-<CR>		Open file or directory at cursor
-I or {Visual}I	Split left and open selected file(s)
-A or {Visual}A	The same as above, but split right
-O or {Visual}O	The same as above, but split above
-o or {Visual}o	The same as above, but split below
+<CR>		Open file(s) at cursor
+I		Split left and open file(s)
+A		Same as above, but split right
+O		Same as above, but split above
+o		Same as above, but split below
+<Tab>		Go to previous (last accessed) window |CTRL-W_CTRL-P|
 [count]<BS>	Go [count] levels up by the directory tree
 [count]<C-^>	Works as "normal" |Ctrl-^| but prefers |w:drvo_altbuf| if set
-=		Sync current directory with buffer
+=		Sync working directory with current buffer
+!		Edit shell command |:!cmd| with selected item(s)
+		Hint: use double hash |c_##| to refer to |arglist|
 <C-D>		Show "Change drive" dialog {only available on MS-Windows}
 <C-L>		Reload buffer (same as `:edit<CR>`)
-[count]<C-G> or
-{Visual}<C-G>	Show selected file(s) info
-[count]! or
-{Visual}!	Edit shell command |:!cmd| with selected item(s)
-		Hint: use double hash |c_##| to refer to |arglist|
-[count]<Space> or
-{Visual}<Space>	Toggle selected item(s) in |arglist|
-D		Clear |arglist| and corresponding |syntax| marks
+<C-G>		Show selected file(s) info
+<Space>		Toggle selected item(s) in |arglist|
+D		Clear |arglist|
 <kMultiply>	Toggle all items in |arglist|
 + or <kPlus>	Show "Select files" dialog
 - or <kMinus>	Show "Deselect files" dialog
@@ -106,8 +103,13 @@ provides:
 
 drvo#change_drive()					 *drvo#change_drive()*
 
-  Show "Change drive" dialog {only available on MS-Windows} Note: Uses
+  Show "Change drive" dialog {only available on MS-Windows} Note uses
   |+popupwin| if available; otherwise uses |confirm()|.
+
+drvo#enter({items} [, {dir}])					|drvo#enter()|
+
+  Open List of {items}. Optional {dir} specifies a preferred direction where
+  to add new |windows|: "h", "j", "k" or "l".
 
 drvo#fileinfo({items})					     *drvo#fileinfo()*
 
@@ -116,15 +118,6 @@ drvo#fileinfo({items})					     *drvo#fileinfo()*
 drvo#forbang({fname})					      *drvo#forbang()*
 
   Prepare {fname} for passing to |:!cmd|
-
-drvo#getline({lnum})					      *drvo#getline()*
-
-  Get "cooked" item: |simplify()|, |fnameescape()| and with a trailing slash
-  removed.
-
-drvo#items({lnum}, {end})					*drvo#items()*
-
-  Get List of "raw" items from {lnum} to {end}, but also filter out "..".
 
 drvo#mark()							 *drvo#mark()*
 
@@ -142,12 +135,12 @@ drvo#readcmd({fmt})					      *drvo#readcmd()*
 
 drvo#sel_mask({add})					     *drvo#sel_mask()*
 
-  Show "Select/Deselect files" dialog. Note: it's a very thin wrapper over
+  Show "Select/Deselect files" dialog. Note it's a very thin wrapper over
   |:argadd| and |:argdelete|, so be wary!
 
 drvo#sel_toggle({items})				   *drvo#sel_toggle()*
 
-  "Xor" |arglist| with new {items} List. Note: all names in {items} List must
+  "Xor" |arglist| with new {items} List. Note all names in {items} List must
   be fully expanded first.
 
 drvo#shdo({fmt}, {dir}, {items})				 *drvo#shdo()*

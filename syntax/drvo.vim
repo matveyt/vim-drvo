@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language:     vim-drvo plugin
 " Maintainer:   matveyt
-" Last Change:  2020 Jul 29
+" Last Change:  2020 Aug 16
 " License:      https://unlicense.org
 " URL:          https://github.com/matveyt/vim-drvo
 
@@ -41,5 +41,7 @@ highlight default link drvoMark Todo
 " reset all marks
 call drvo#mark()
 
+unlet s:ccd s:ccf
+
 let &cpo = s:save_cpo
-unlet s:save_cpo s:ccd s:ccf
+unlet s:save_cpo

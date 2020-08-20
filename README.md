@@ -8,4 +8,4 @@ Use whatever plugin manager to pull the master branch.
 
 ### Usage
 
-Read `:help drvo`.
+Type `:e.` to open the current directory. Also read `:help drvo`.

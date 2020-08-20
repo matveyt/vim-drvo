@@ -1,6 +1,6 @@
 " Vim drvo plugin
 " Maintainer:   matveyt
-" Last Change:  2020 Jul 30
+" Last Change:  2020 Aug 20
 " License:      https://unlicense.org
 " URL:          https://github.com/matveyt/vim-drvo
 
@@ -59,6 +59,11 @@ function s:ignore_case() abort
     return &fileignorecase || has('win32')
 endfunction
 
+" drop '.' and '..' out of {items}
+function s:no_dots(items) abort
+    return filter(copy(a:items), {_, v -> v !~# '\([\/]\)\.\+\1$'})
+endfunction
+
 " Implements 'Change drive' dialog on MS-Windows
 function! drvo#change_drive() abort
     let l:drives = s:get_drives()
@@ -68,9 +73,9 @@ function! drvo#change_drive() abort
             if a:result > 0
                 "BUG: Neovim cannot fnamemodify('C:', ':p:h')
                 let l:dir = has('nvim') ? l:drives[a:result - 1]..'/' :
-                    \ fnamemodify(l:drives[a:result - 1], ':p:h')
+                    \ fnameescape(fnamemodify(l:drives[a:result - 1], ':p:h'))
                 " cd to new dir
-                edit `=fnameescape(l:dir)`
+                execute 'edit' l:dir
             endif
         endfunction
         " execute dialog
@@ -81,6 +86,33 @@ function! drvo#change_drive() abort
             call s:on_end_dialog(0, confirm('Change drive', join(l:drives, "\n")))
         endif
     endif
+endfunction
+
+" Open List of items
+function! drvo#enter(items, ...) abort
+    let l:dir = get(a:, 1)
+    let l:oth = v:true
+    if l:dir is# 'h'
+        let l:cmd = 'leftabove vnew'
+    elseif l:dir is# 'j'
+        let l:cmd = 'rightbelow new'
+    elseif l:dir is# 'k'
+        let l:cmd = 'leftabove new'
+    elseif l:dir is# 'l'
+        let l:cmd = 'rightbelow vnew'
+    else
+        let l:cmd = 'vnew'
+        let l:oth = v:false
+    endif
+
+    if l:oth
+        execute winnr(l:dir) != winnr() ? 'wincmd '..l:dir : l:cmd
+    endif
+    execute 'edit' fnameescape(s:chomp(a:items[0]))
+    for l:item in reverse(a:items[1:])
+        execute l:cmd fnameescape(s:chomp(l:item))
+        wincmd p
+    endfor
 endfunction
 
 " Print misc. file info
@@ -104,16 +136,6 @@ function! drvo#forbang(fname) abort
         let l:fname = fnamemodify(a:fname, ':p')
     endif
     return shellescape(l:fname, v:true)
-endfunction
-
-" Get "cooked" item
-function! drvo#getline(lnum) abort
-    return fnameescape(simplify(s:chomp(getline(a:lnum))))
-endfunction
-
-" Get "raw" items [lnum..end] filtering out '..'
-function! drvo#items(lnum, end) abort
-    return filter(getline(a:lnum, a:end), {_, v -> v !~# '\([\/]\)\.\.\1$'})
 endfunction
 
 " Make syntax to match arglist
@@ -163,17 +185,18 @@ endfunction
 function! drvo#readcmd(fmt) abort
     if a:fmt is# 'dir'
         let l:dir = fnamemodify(@%, ':p')
-        if l:dir =~# '[\/]$'
+        let l:slash = l:dir[-1:]
+        if l:slash is# '/' || l:slash is# '\'
             " read in directory contents
             let l:lines = map(glob(l:dir..'.?*', 0, 1) + glob(l:dir..'*', 0, 1),
-                \ {_, f -> isdirectory(f) ? f..l:dir[-1:] : f})
+                \ {_, f -> isdirectory(f) ? f..l:slash : f})
             if l:dir is# fnamemodify(l:dir, ':h')
                 " root directory: filter out '..'
-                call filter(l:lines, {_, v -> v !~# '\([\/]\)\.\.\1$'})
+                let l:lines = s:no_dots(l:lines)
             elseif empty(l:lines)
                 " no '..' in a subdirectory: access denied
                 echohl WarningMsg | echo 'Access denied' | echohl None
-                call add(l:lines, l:dir..'..'..l:dir[-1:])
+                call add(l:lines, fnamemodify(l:dir, ':h:h')..l:slash)
             endif
         else
             echohl WarningMsg | echo 'Not a directory' | echohl None
@@ -208,10 +231,11 @@ endfunction
 function! drvo#sel_toggle(items) abort
     " expand all names in arglist
     let l:argv = map(argv(), {_, v -> fnamemodify(v, ':p')})
-    for l:item in a:items
+    " toggle all items
+    for l:item in s:no_dots(a:items)
         let l:idx = index(l:argv, l:item)
-        if l:idx == -1
-            $argadd `=fnameescape(l:item)`
+        if l:idx < 0
+            $argadd `=l:item`
         else
             execute string(l:idx + 1) 'argdelete'
             call remove(l:argv, l:idx)
@@ -227,7 +251,7 @@ endfunction
 "     {items} is List of file names, or empty to use arglist instead
 function! drvo#shdo(fmt, dir, items) abort
     new
-    silent! lcd `=fnameescape(a:dir)`
+    silent! lcd `=a:dir`
     call setline(1, '#!'..&shell)
     call setline(2, 'cd '..shellescape(getcwd()))
     for l:item in (empty(a:items) ? argv() : a:items)
