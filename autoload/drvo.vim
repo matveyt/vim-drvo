@@ -1,6 +1,6 @@
 " Vim drvo plugin
 " Maintainer:   matveyt
-" Last Change:  2020 Aug 20
+" Last Change:  2020 Sep 25
 " License:      https://unlicense.org
 " URL:          https://github.com/matveyt/vim-drvo
 
@@ -64,12 +64,41 @@ function s:no_dots(items) abort
     return filter(copy(a:items), {_, v -> v !~# '\([\/]\)\.\+\1$'})
 endfunction
 
+" read directory contents
+function s:readdir(dir) abort
+    let l:dir = fnamemodify(a:dir, ':p')
+    let l:is_root = l:dir is# fnamemodify(l:dir, ':h')
+    let l:lines = v:null
+    let l:slash = l:dir[-1:]
+
+    if l:slash is# '/' || l:slash is# '\'
+        if exists('*readdir')
+            let l:lines = readdir(l:dir)
+            call map(l:lines, {_, f -> isdirectory(l:dir..f) ? l:dir..f..l:slash :
+                \ l:dir..f})
+            if !l:is_root
+                " non-root directory: add '..'
+                call insert(l:lines, l:dir..'..'..l:slash)
+            endif
+        else "glob()
+            let l:lines = glob(l:dir..'.?*', 0, 1) + glob(l:dir..'*', 0, 1)
+            call map(l:lines, {_, f -> isdirectory(f) ? f..l:slash : f})
+            if l:is_root
+                " root directory: filter out '..'
+                let l:lines = s:no_dots(l:lines)
+            endif
+        endif
+    endif
+
+    return l:lines
+endfunction
+
 " Implements 'Change drive' dialog on MS-Windows
 function! drvo#change_drive() abort
     let l:drives = s:get_drives()
     if !empty(l:drives)
         " 'closure' function to process user choice
-        function! s:on_end_dialog(_, result) closure
+        function! s:on_end_dialog(_, result) abort closure
             if a:result > 0
                 "BUG: Neovim cannot fnamemodify('C:', ':p:h')
                 let l:dir = has('nvim') ? l:drives[a:result - 1]..'/' :
@@ -181,29 +210,17 @@ function! drvo#prettify() abort
     call search('\V\C'..escape(@#, '\'), 'cw')
 endfunction
 
-" Read in our buffer
+" Fill in our buffer
 function! drvo#readcmd(fmt) abort
     if a:fmt is# 'dir'
-        let l:dir = fnamemodify(@%, ':p')
-        let l:slash = l:dir[-1:]
-        if l:slash is# '/' || l:slash is# '\'
-            " read in directory contents
-            let l:lines = map(glob(l:dir..'.?*', 0, 1) + glob(l:dir..'*', 0, 1),
-                \ {_, f -> isdirectory(f) ? f..l:slash : f})
-            if l:dir is# fnamemodify(l:dir, ':h')
-                " root directory: filter out '..'
-                let l:lines = s:no_dots(l:lines)
-            elseif empty(l:lines)
-                " no '..' in a subdirectory: access denied
-                echohl WarningMsg | echo 'Access denied' | echohl None
-                call add(l:lines, fnamemodify(l:dir, ':h:h')..l:slash)
-            endif
-        else
-            echohl WarningMsg | echo 'Not a directory' | echohl None
-            let l:lines = fnamemodify(getcwd(), ':p')
-        endif
+        let l:lines = s:readdir(@%)
     else
         "TODO
+    endif
+
+    if empty(l:lines)
+        echohl ErrorMsg | echo 'Cannot read a directory' | echohl None
+        let l:lines = fnamemodify(empty(@#) ? getcwd() : @#, ':p')
     endif
 
     silent call deletebufline('', 1, '$')
