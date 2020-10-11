@@ -1,6 +1,6 @@
 " Vim drvo plugin
 " Maintainer:   matveyt
-" Last Change:  2020 Sep 25
+" Last Change:  2020 Oct 10
 " License:      https://unlicense.org
 " URL:          https://github.com/matveyt/vim-drvo
 
@@ -120,28 +120,30 @@ endfunction
 " Open List of items
 function! drvo#enter(items, ...) abort
     let l:dir = get(a:, 1)
-    let l:oth = v:true
     if l:dir is# 'h'
-        let l:cmd = 'leftabove vnew'
+        let [l:cmd, l:split] = ['leftabove vnew', v:true]
     elseif l:dir is# 'j'
-        let l:cmd = 'rightbelow new'
+        let [l:cmd, l:split] = ['rightbelow new', v:true]
     elseif l:dir is# 'k'
-        let l:cmd = 'leftabove new'
+        let [l:cmd, l:split] = ['leftabove new', v:true]
     elseif l:dir is# 'l'
-        let l:cmd = 'rightbelow vnew'
+        let [l:cmd, l:split] = ['rightbelow vnew', v:true]
     else
-        let l:cmd = 'vnew'
-        let l:oth = v:false
+        let [l:cmd, l:split] = ['vnew', v:false]
     endif
 
-    if l:oth
-        execute winnr(l:dir) != winnr() ? 'wincmd '..l:dir : l:cmd
+    if l:split
+        let l:curr = winnr()
+        execute winnr(l:dir) != l:curr ? 'wincmd '..l:dir : l:cmd
     endif
     execute 'edit' fnameescape(s:chomp(a:items[0]))
     for l:item in reverse(a:items[1:])
         execute l:cmd fnameescape(s:chomp(l:item))
         wincmd p
     endfor
+    if l:split
+        execute l:curr 'wincmd w'
+    endif
 endfunction
 
 " Print misc. file info
