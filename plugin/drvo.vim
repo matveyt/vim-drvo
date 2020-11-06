@@ -1,6 +1,6 @@
 " Vim drvo plugin
 " Maintainer:   matveyt
-" Last Change:  2020 Aug 15
+" Last Change:  2020 Oct 30
 " License:      https://unlicense.org
 " URL:          https://github.com/matveyt/vim-drvo
 
@@ -30,15 +30,13 @@ augroup FileExplorer | au!
 augroup end
 
 " check already created buffers (e.g. command-line args)
-if !v:vim_did_enter
-    for s:buf in getbufinfo({'buflisted': 1})
-        if !s:buf.loaded && isdirectory(s:buf.name)
-            execute 'autocmd! BufReadCmd <buffer='..s:buf.bufnr..'>'
-                \ 'call drvo#readcmd("dir")'
-        endif
-    endfor
-    unlet! s:buf
-endif
+for s:buf in getbufinfo()
+    if !s:buf.loaded && isdirectory(s:buf.name)
+        execute 'autocmd! BufReadCmd <buffer='..s:buf.bufnr..'>'
+            \ 'call drvo#readcmd("dir")'
+    endif
+endfor
+unlet! s:buf
 
 let &cpo = s:save_cpo
 unlet s:save_cpo

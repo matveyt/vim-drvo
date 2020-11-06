@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language:     vim-drvo plugin
 " Maintainer:   matveyt
-" Last Change:  2020 Aug 16
+" Last Change:  2020 Oct 20
 " License:      https://unlicense.org
 " URL:          https://github.com/matveyt/vim-drvo
 
@@ -15,8 +15,8 @@ set cpo&vim
 
 " use g:drvo_glyph[] for cchar's if any
 if exists('g:drvo_glyph')
-    let s:ccd = 'cchar='..nr2char(g:drvo_glyph[0], 1)
-    let s:ccf = 'cchar='..nr2char(g:drvo_glyph[1], 1)
+    let s:ccd = 'cchar='..nr2char(g:drvo_glyph[0])
+    let s:ccf = 'cchar='..nr2char(g:drvo_glyph[1])
 else
     let s:ccd = ''
     let s:ccf = ''
