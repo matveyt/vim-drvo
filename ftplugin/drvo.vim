@@ -1,7 +1,7 @@
 " Vim filetype file
 " Language:     vim-drvo plugin
 " Maintainer:   matveyt
-" Last Change:  2020 Aug 20
+" Last Change:  2020 Dec 14
 " License:      https://unlicense.org
 " URL:          https://github.com/matveyt/vim-drvo
 
@@ -15,7 +15,8 @@ set cpo&vim
 
 " buffer-local options
 let b:undo_ftplugin = 'setl bt< bh< swf< ul<'
-setlocal buftype=nowrite bufhidden=delete noswapfile undolevels=0
+setlocal buftype=nowrite noswapfile undolevels=0
+let &l:bufhidden = exists('#BufReadCmd#<buffer>') ? 'delete' : 'hide'
 " window-local options
 let b:undo_ftplugin .= ' cocu< cole< cul< spell< wrap<'
 setlocal concealcursor=n conceallevel=2 cursorline nospell nowrap
@@ -23,7 +24,7 @@ setlocal concealcursor=n conceallevel=2 cursorline nospell nowrap
 " create shell script with names from Visual selection (or arglist)
 command! -buffer -range -nargs=? -complete=shellcmd Shdo
     \ call drvo#shdo(empty(<q-args>) ? '{}' : <q-args>, @%,
-        \ <range> ? getline(<line1>, <line2>) : v:none)
+        \ <range> ? getline(<line1>, <line2>) : v:null)
 
 " g? to show help
 nnoremap <buffer><silent>g? :help! drvo-mappings<CR>
