@@ -1,7 +1,7 @@
 " Vim filetype file
 " Language:     vim-drvo plugin
 " Maintainer:   matveyt
-" Last Change:  2021 Jan 20
+" Last Change:  2021 Jan 21
 " License:      https://unlicense.org
 " URL:          https://github.com/matveyt/vim-drvo
 
@@ -44,10 +44,12 @@ nnoremap <buffer><expr><silent><BS> ':<C-U>edit %'..repeat(':h', v:count1)..'<CR
 " <C-^> to switch to the altbuf (last known good)
 nnoremap <buffer><expr><silent><C-^>
     \ ':<C-U>edit #'..(v:count ? v:count : get(w:, 'drvo_altbuf'))..'<CR>'
-" = to sync current directory with buffer
+" = to sync current working directory to buffer
 nnoremap <buffer><nowait><silent>= :noautocmd lcd % <Bar> pwd<CR>
 " ~ to go $HOME
-nnoremap <buffer><silent>~ :edit $HOME<CR>
+nnoremap <buffer><silent>~ :<C-U>edit $HOME<CR>
+" . to go to current working directory
+nnoremap <buffer><silent>. :<C-U>edit .<CR>
 
 " <C-D> to change drive
 nnoremap <buffer><silent><C-D> :call drvo#change_drive()<CR>

@@ -83,8 +83,9 @@ o		Same as above, but split below
 <Tab>		Go to previous (last accessed) window |CTRL-W_CTRL-P|
 [count]<BS>	Go [count] levels up by the directory tree
 [count]<C-^>	Works as "normal" |Ctrl-^| but prefers |w:drvo_altbuf| if set
-=		Sync working directory with current buffer
-~		Go $HOME
+=		|:lcd| to current buffer
+~		Go |$HOME|
+.		Go to current working directory |getcwd()|
 !		Edit shell command |:!cmd| with selected item(s)
 		Hint: use double hash |c_##| to refer to |arglist|
 <C-D>		Show "Change drive" dialog {only available on MS-Windows}
