@@ -1,7 +1,7 @@
 " Vim filetype file
 " Language:     vim-drvo plugin
 " Maintainer:   matveyt
-" Last Change:  2021 Jan 21
+" Last Change:  2021 Mar 23
 " License:      https://unlicense.org
 " URL:          https://github.com/matveyt/vim-drvo
 
@@ -25,7 +25,13 @@ setlocal concealcursor=n conceallevel=2 cursorline nospell nowrap
 command! -buffer -range -nargs=? -complete=shellcmd Shdo
     \ call drvo#shdo(empty(<q-args>) ? '{}' : <q-args>, @%,
         \ <range> ? getline(<line1>, <line2>) : v:null)
+" find file under @% directory
+command! -buffer -bar -nargs=1 Findfile
+    \ call setloclist(0, [], 'r', {'lines': glob('%/**/'..<q-args>, v:false, v:true),
+        \ 'efm': '%f', 'title': 'Find file: '..<q-args>}) | lopen
 
+" ? to find file
+nnoremap <buffer>? :Findfile<Space>
 " g? to show help
 nnoremap <buffer><silent>g? :help! drvo-mappings<CR>
 

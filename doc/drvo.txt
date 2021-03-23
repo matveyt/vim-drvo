@@ -51,23 +51,21 @@ you don't need to tackle with this, but you're free to read and modify
 ==============================================================================
 COMMANDS						       *drvo-commands*
 
-There is a single buffer-local command |:command-buffer|, named |:Shdo|
-to dump selected file names (or |arglist|) into a new buffer.
-
 :Shdo [fmt]							       *:Shdo*
 
-  Creates a new buffer/window and dumps |arglist| into it with each line
+  Create a new buffer/window and dump |arglist| into it with each line
   formatted according to [fmt]. The only substitution allowed in [fmt]:
   `{`|filename-modifiers|`}` stands for the current list item. The default for
   [fmt] is `{:.:S}`
 
 :{range}Shdo [fmt]
 
-  Same as previous version, but dumps line |:range| instead of |arglist|.
+  Same as previous version, but dump line |:range| instead of |arglist|.
 
-Note the plugin doesn't provide any additional support for executing that
-buffer contents on-the-fly. It's upon you to develop such functionality
-yourself or to use some 3rd party plugin.
+:Findfile [mask]					           *:Findfile*
+
+  Find files matching [mask] starting from |current-file| directory and show
+  them in |location-list|.
 
 ==============================================================================
 MAPPINGS						       *drvo-mappings*
@@ -86,6 +84,7 @@ o		Same as above, but split below
 =		|:lcd| to current buffer
 ~		Go |$HOME|
 .		Go to current working directory |getcwd()|
+?		Find file(s) under |current-file| directory tree |:Findfile|
 !		Edit shell command |:!cmd| with selected item(s)
 		Hint: use double hash |c_##| to refer to |arglist|
 <C-D>		Show "Change drive" dialog {only available on MS-Windows}
