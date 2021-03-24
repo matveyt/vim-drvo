@@ -67,6 +67,14 @@ COMMANDS						       *drvo-commands*
   Find files matching [mask] starting from |current-file| directory and show
   them in |location-list|.
 
+:Selectfile [mask]					         *:Selectfile*
+
+  Add files matching [mask] to |arglist|.
+
+:Deselectfile [mask]					       *:Deselectfile*
+
+  Remove files matching [mask] from |arglist|.
+
 ==============================================================================
 MAPPINGS						       *drvo-mappings*
 
@@ -84,7 +92,6 @@ o		Same as above, but split below
 =		|:lcd| to current buffer
 ~		Go |$HOME|
 .		Go to current working directory |getcwd()|
-?		Find file(s) under |current-file| directory tree |:Findfile|
 !		Edit shell command |:!cmd| with selected item(s)
 		Hint: use double hash |c_##| to refer to |arglist|
 <C-D>		Show "Change drive" dialog {only available on MS-Windows}
@@ -93,8 +100,9 @@ o		Same as above, but split below
 <Space>		Toggle selected item(s) in |arglist|
 D		Clear |arglist|
 <kMultiply>	Toggle all items in |arglist|
-+ or <kPlus>	Show "Select files" dialog
-- or <kMinus>	Show "Deselect files" dialog
++ or <kPlus>	Select file mask |:Selectfile|
+- or <kMinus>	Deselect file mask |:Deselectfile|
+?		Find file(s) under |current-file| directory tree |:Findfile|
 
 ==============================================================================
 *FUNCTIONS*						      *drvo-functions*
@@ -133,11 +141,6 @@ drvo#prettify()						     *drvo#prettify()*
 drvo#readcmd({fmt})					      *drvo#readcmd()*
 
   Internal function to implement |BufReadCmd|.
-
-drvo#sel_mask({add})					     *drvo#sel_mask()*
-
-  Show "Select/Deselect files" dialog. Note it's a very thin wrapper over
-  |:argadd| and |:argdelete|, so be wary!
 
 drvo#sel_toggle({items})				   *drvo#sel_toggle()*
 

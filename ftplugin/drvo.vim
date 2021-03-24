@@ -1,7 +1,7 @@
 " Vim filetype file
 " Language:     vim-drvo plugin
 " Maintainer:   matveyt
-" Last Change:  2021 Mar 23
+" Last Change:  2021 Mar 24
 " License:      https://unlicense.org
 " URL:          https://github.com/matveyt/vim-drvo
 
@@ -26,12 +26,13 @@ command! -buffer -range -nargs=? -complete=shellcmd Shdo
     \ call drvo#shdo(empty(<q-args>) ? '{}' : <q-args>, @%,
         \ <range> ? getline(<line1>, <line2>) : v:null)
 " find file under @% directory
-command! -buffer -bar -nargs=1 Findfile
+command! -buffer -nargs=1 Findfile
     \ call setloclist(0, [], 'r', {'lines': glob('%/**/'..<q-args>, v:false, v:true),
         \ 'efm': '%f', 'title': 'Find file: '..<q-args>}) | lopen
+" select/deselect file mask
+command! -buffer -nargs=1 Selectfile $argadd <args> | call drvo#mark()
+command! -buffer -nargs=1 Deselectfile argdelete <args> | call drvo#mark()
 
-" ? to find file
-nnoremap <buffer>? :Findfile<Space>
 " g? to show help
 nnoremap <buffer><silent>g? :help! drvo-mappings<CR>
 
@@ -42,6 +43,20 @@ xnoremap <buffer><silent><CR> :<C-U>call drvo#enter(getline("'<", "'>"))<CR>
 nnoremap <buffer><silent><2-LeftMouse> :<C-U>call drvo#enter(getline('.', line('.') +
     \ v:count1 - 1))<CR>
 xnoremap <buffer><silent><2-LeftMouse> :<C-U>call drvo#enter(getline("'<", "'>"))<CR>
+
+" I/A/O/o to open current file/dir on the left/right/above/below
+nnoremap <buffer><silent>I :<C-U>call drvo#enter(getline('.', line('.') +
+    \ v:count1 - 1), 'h')<CR>
+xnoremap <buffer><silent>I :<C-U>call drvo#enter(getline("'<", "'>"), 'h')<CR>
+nnoremap <buffer><silent>A :<C-U>call drvo#enter(getline('.', line('.') +
+    \ v:count1 - 1), 'l')<CR>
+xnoremap <buffer><silent>A :<C-U>call drvo#enter(getline("'<", "'>"), 'l')<CR>
+nnoremap <buffer><silent>O :<C-U>call drvo#enter(getline('.', line('.') +
+    \ v:count1 - 1), 'k')<CR>
+xnoremap <buffer><silent>O :<C-U>call drvo#enter(getline("'<", "'>"), 'k')<CR>
+nnoremap <buffer><silent>o :<C-U>call drvo#enter(getline('.', line('.') +
+    \ v:count1 - 1), 'j')<CR>
+xnoremap <buffer><silent>o :<C-U>call drvo#enter(getline("'<", "'>"), 'j')<CR>
 
 " <Tab> to move to previous window
 nnoremap <buffer><Tab> <C-W>p
@@ -57,6 +72,12 @@ nnoremap <buffer><silent>~ :<C-U>edit $HOME<CR>
 " . to go to current working directory
 nnoremap <buffer><silent>. :<C-U>edit .<CR>
 
+" ! to compose shell command
+nnoremap <buffer>! :<C-U><Space><C-R>=join(map(getline('.', line('.') + v:count1 - 1),
+    \ 'drvo#forbang(v:val)'))<CR><C-B>!
+xnoremap <buffer>! :<C-U><Space><C-R>=join(map(getline("'<", "'>"),
+    \ 'drvo#forbang(v:val)'))<CR><C-B>!
+
 " <C-D> to change drive
 nnoremap <buffer><silent><C-D> :call drvo#change_drive()<CR>
 " <C-L> to reload directory
@@ -65,12 +86,6 @@ nnoremap <buffer><silent><C-L> :edit<CR>
 nnoremap <buffer><silent><C-G> :<C-U>call drvo#fileinfo(getline('.', line('.') +
     \ v:count1 - 1))<CR>
 xnoremap <buffer><silent><C-G> :<C-U>call drvo#fileinfo(getline("'<", "'>"))<CR>
-
-" ! to compose shell command
-nnoremap <buffer>! :<C-U><Space><C-R>=join(map(getline('.', line('.') + v:count1 - 1),
-    \ 'drvo#forbang(v:val)'))<CR><C-B>!
-xnoremap <buffer>! :<C-U><Space><C-R>=join(map(getline("'<", "'>"),
-    \ 'drvo#forbang(v:val)'))<CR><C-B>!
 
 " <Space> to toggle items in the arglist
 nnoremap <buffer><silent><Space>
@@ -84,24 +99,12 @@ nnoremap <buffer><silent>D :%argdelete <Bar> syntax clear drvoMark<CR>
 " <kMultiply> to invert selection
 nnoremap <buffer><silent><kMultiply> :call drvo#sel_toggle(getline(1, '$'))<CR>
 " +/- to select/deselect file mask
-nnoremap <buffer><silent>+ :call drvo#sel_mask(v:true)<CR>
-nnoremap <buffer><silent><kPlus> :call drvo#sel_mask(v:true)<CR>
-nnoremap <buffer><silent>- :call drvo#sel_mask(v:false)<CR>
-nnoremap <buffer><silent><kMinus> :call drvo#sel_mask(v:false)<CR>
-
-" I/A/O/o to open current file/dir on the left/right/above/below
-nnoremap <buffer><silent>I :<C-U>call drvo#enter(getline('.', line('.') +
-    \ v:count1 - 1), 'h')<CR>
-xnoremap <buffer><silent>I :<C-U>call drvo#enter(getline("'<", "'>"), 'h')<CR>
-nnoremap <buffer><silent>A :<C-U>call drvo#enter(getline('.', line('.') +
-    \ v:count1 - 1), 'l')<CR>
-xnoremap <buffer><silent>A :<C-U>call drvo#enter(getline("'<", "'>"), 'l')<CR>
-nnoremap <buffer><silent>O :<C-U>call drvo#enter(getline('.', line('.') +
-    \ v:count1 - 1), 'k')<CR>
-xnoremap <buffer><silent>O :<C-U>call drvo#enter(getline("'<", "'>"), 'k')<CR>
-nnoremap <buffer><silent>o :<C-U>call drvo#enter(getline('.', line('.') +
-    \ v:count1 - 1), 'j')<CR>
-xnoremap <buffer><silent>o :<C-U>call drvo#enter(getline("'<", "'>"), 'j')<CR>
+nnoremap <buffer>+ :Selectfile<Space>%/*
+nnoremap <buffer><kPlus> :Selectfile<Space>%/*
+nnoremap <buffer>- :Deselectfile<Space>%/*
+nnoremap <buffer><kMinus> :Deselectfile<Space>%/*
+" ? to find file
+nnoremap <buffer>? :Findfile<Space>
 
 " sort lines, set cursor etc.
 call drvo#prettify()

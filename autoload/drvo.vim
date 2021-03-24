@@ -1,6 +1,6 @@
 " Vim drvo plugin
 " Maintainer:   matveyt
-" Last Change:  2020 Oct 10
+" Last Change:  2021 Mar 24
 " License:      https://unlicense.org
 " URL:          https://github.com/matveyt/vim-drvo
 
@@ -228,21 +228,6 @@ function! drvo#readcmd(fmt) abort
     silent call deletebufline('', 1, '$')
     call setline(1, l:lines)
     setfiletype drvo
-endfunction
-
-" Select files dialog
-function! drvo#sel_mask(add) abort
-    let l:prompt = a:add ? 'Select' : 'Deselect'
-    let l:mask = expand('%:p:h') is# getcwd() ? '*' : '%:./*'
-    if exists('*inputdialog')
-        let l:mask = inputdialog(l:prompt, l:mask)
-    else
-        let l:mask = input(l:prompt..': ', l:mask, 'file')
-    endif
-    if !empty(l:mask)
-        silent! execute (a:add ? '$argadd' : 'argdelete') l:mask
-        call drvo#mark()
-    endif
 endfunction
 
 " Xor arglist with another {items} List
