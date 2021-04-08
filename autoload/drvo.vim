@@ -1,6 +1,6 @@
 " Vim drvo plugin
 " Maintainer:   matveyt
-" Last Change:  2021 Mar 24
+" Last Change:  2021 Apr 08
 " License:      https://unlicense.org
 " URL:          https://github.com/matveyt/vim-drvo
 
@@ -131,14 +131,16 @@ function! drvo#enter(items, ...) abort
     else
         let [l:cmd, l:split] = ['vnew', v:false]
     endif
+    let l:alt = exists(':balt') == 2 && exists('w:drvo_altbuf') &&
+        \ bufexists(w:drvo_altbuf) ? '+balt\ #'..w:drvo_altbuf : ''
 
     if l:split
         let l:curr = winnr()
         execute winnr(l:dir) != l:curr ? 'wincmd '..l:dir : l:cmd
     endif
-    execute 'edit' fnameescape(s:chomp(a:items[0]))
+    execute 'edit' l:alt fnameescape(s:chomp(a:items[0]))
     for l:item in reverse(a:items[1:])
-        execute l:cmd fnameescape(s:chomp(l:item))
+        execute 'keepalt' l:cmd fnameescape(s:chomp(l:item))
         wincmd p
     endfor
     if l:split
