@@ -135,8 +135,8 @@ function! drvo#enter(items, ...) abort
         \ bufexists(w:drvo_altbuf) ? '+balt\ #'..w:drvo_altbuf : ''
 
     if l:split
-        let l:curr = winnr()
-        execute winnr(l:dir) != l:curr ? 'wincmd '..l:dir : l:cmd
+        let l:winid = win_getid()
+        execute winnr(l:dir) != win_id2win(l:winid) ? 'wincmd '..l:dir : l:cmd
     endif
     execute 'edit' l:alt fnameescape(s:chomp(a:items[0]))
     for l:item in reverse(a:items[1:])
@@ -144,7 +144,7 @@ function! drvo#enter(items, ...) abort
         wincmd p
     endfor
     if l:split
-        execute l:curr 'wincmd w'
+        call win_gotoid(l:winid)
     endif
 endfunction
 
