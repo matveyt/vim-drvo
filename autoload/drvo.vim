@@ -1,6 +1,6 @@
 " Vim drvo plugin
 " Maintainer:   matveyt
-" Last Change:  2021 Apr 08
+" Last Change:  2021 May 01
 " License:      https://unlicense.org
 " URL:          https://github.com/matveyt/vim-drvo
 
@@ -205,7 +205,7 @@ function! drvo#prettify() abort
 
     " remember altbuf if it's a regular one
     let l:altbuf = bufnr(0)
-    if l:altbuf != -1 && buflisted(l:altbuf) &&
+    if buflisted(l:altbuf) && !empty(bufname(l:altbuf)) &&
         \ getbufvar(l:altbuf, '&filetype') isnot# 'drvo'
         let w:drvo_altbuf = l:altbuf
     endif
