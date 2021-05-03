@@ -1,6 +1,6 @@
 " Vim drvo plugin
 " Maintainer:   matveyt
-" Last Change:  2021 May 01
+" Last Change:  2021 May 03
 " License:      https://unlicense.org
 " URL:          https://github.com/matveyt/vim-drvo
 
@@ -132,7 +132,7 @@ function! drvo#enter(items, ...) abort
         let [l:cmd, l:split] = ['vnew', v:false]
     endif
     let l:alt = exists(':balt') == 2 && exists('w:drvo_altbuf') &&
-        \ bufexists(w:drvo_altbuf) ? '+balt\ #'..w:drvo_altbuf : ''
+        \ !empty(bufname(w:drvo_altbuf)) ? '+balt\ #'..w:drvo_altbuf : ''
 
     if l:split
         let l:winid = win_getid()
@@ -203,10 +203,9 @@ function! drvo#prettify() abort
     execute 'sort' l:case '/^.*[\/]/'
     execute 'sort' l:case '/\.[^.\/]\+$/r'
 
-    " remember altbuf if it's a regular one
+    " remember altbuf
     let l:altbuf = bufnr(0)
-    if buflisted(l:altbuf) && !empty(bufname(l:altbuf)) &&
-        \ getbufvar(l:altbuf, '&filetype') isnot# 'drvo'
+    if buflisted(l:altbuf) && getbufvar(l:altbuf, '&filetype') isnot# 'drvo'
         let w:drvo_altbuf = l:altbuf
     endif
 
