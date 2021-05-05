@@ -1,7 +1,7 @@
 " Vim filetype file
 " Language:     vim-drvo plugin
 " Maintainer:   matveyt
-" Last Change:  2021 May 03
+" Last Change:  2021 May 04
 " License:      https://unlicense.org
 " URL:          https://github.com/matveyt/vim-drvo
 
@@ -101,8 +101,8 @@ nnoremap <buffer><silent><kMultiply> :call drvo#sel_toggle(getline(1, '$'))<CR>
 " +/- to select/deselect file mask
 nnoremap <buffer>+ :Selectfile<Space>%/*
 nnoremap <buffer><kPlus> :Selectfile<Space>%/*
-nnoremap <buffer>- :Deselectfile<Space>%/*
-nnoremap <buffer><kMinus> :Deselectfile<Space>%/*
+nnoremap <buffer>- :Deselectfile<Space>*
+nnoremap <buffer><kMinus> :Deselectfile<Space>*
 " ? to find file
 nnoremap <buffer>? :Findfile<Space>
 

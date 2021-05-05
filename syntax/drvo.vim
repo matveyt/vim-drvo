@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language:     vim-drvo plugin
 " Maintainer:   matveyt
-" Last Change:  2020 Oct 20
+" Last Change:  2021 May 04
 " License:      https://unlicense.org
 " URL:          https://github.com/matveyt/vim-drvo
 
@@ -36,7 +36,7 @@ syntax match drvoFileTrunk /.\+/ contained
 
 " setup default color groups
 highlight default link drvoDirTrunk Directory
-highlight default link drvoMark Todo
+highlight default link drvoMark IncSearch
 
 " reset all marks
 call drvo#mark()
