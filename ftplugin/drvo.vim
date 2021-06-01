@@ -1,7 +1,7 @@
 " Vim filetype file
 " Language:     vim-drvo plugin
 " Maintainer:   matveyt
-" Last Change:  2021 May 04
+" Last Change:  2021 Jun 01
 " License:      https://unlicense.org
 " URL:          https://github.com/matveyt/vim-drvo
 
@@ -40,6 +40,9 @@ nnoremap <buffer><silent>g? :help! drvo-mappings<CR>
 nnoremap <buffer><silent><CR> :<C-U>call drvo#enter(getline('.', line('.') +
     \ v:count1 - 1))<CR>
 xnoremap <buffer><silent><CR> :<C-U>call drvo#enter(getline("'<", "'>"))<CR>
+nnoremap <buffer><silent><kEnter> :<C-U>call drvo#enter(getline('.', line('.') +
+    \ v:count1 - 1))<CR>
+xnoremap <buffer><silent><kEnter> :<C-U>call drvo#enter(getline("'<", "'>"))<CR>
 nnoremap <buffer><silent><2-LeftMouse> :<C-U>call drvo#enter(getline('.', line('.') +
     \ v:count1 - 1))<CR>
 xnoremap <buffer><silent><2-LeftMouse> :<C-U>call drvo#enter(getline("'<", "'>"))<CR>
