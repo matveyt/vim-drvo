@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language:     vim-drvo plugin
 " Maintainer:   matveyt
-" Last Change:  2021 May 04
+" Last Change:  2021 Aug 10
 " License:      https://unlicense.org
 " URL:          https://github.com/matveyt/vim-drvo
 
@@ -24,18 +24,30 @@ endif
 
 " drvoDir is {drvoDirRoot/}{drvoDirTrunk}{/}
 syntax match drvoDir /^.*[\/]$/ contains=drvoDirRoot
-execute 'syntax match drvoDirRoot nextgroup=drvoMark,drvoDirTrunk /^.*[\/]\ze./'
+execute 'syntax match drvoDirRoot nextgroup=drvoDirTrunk,drvoMark /^.*[\/]\ze./'
     \ 'contained conceal' s:ccd
 syntax match drvoDirTrunk nextgroup=drvoLastSlash /[^\/]\+/ contained
 syntax match drvoLastSlash /[\/]/ contained conceal
-" drvoFile is {drvoFileRoot/}{drvoFileTrunk}
+" drvoFile is {drvoFileRoot/}{drvoFileXXX}
 syntax match drvoFile /^.*[^\/]$/ contains=drvoFileRoot
-execute 'syntax match drvoFileRoot nextgroup=drvoMark,drvoFileTrunk /^.*[\/]/'
-    \ 'contained conceal' s:ccf
-syntax match drvoFileTrunk /.\+/ contained
+execute 'syntax match drvoFileRoot nextgroup=drvoFileRegular,drvoFileArc,drvoFileBak,'
+    \ 'drvoFileExe,drvoMark /^.*[\/]/ contained conceal' s:ccf
+syntax match drvoFileRegular /.\+/ contained
+syntax match drvoFileArc /\c.\+\.\%(bz2\|cab\|msi\|rar\|tar\|zip\|[7g]z\|t[abgx]z\)$/
+    \ contained
+syntax match drvoFileBak /\c.\+\.\%(bak\|tmp\)$/ contained
+if exists('$PATHEXT')
+    let s:pat = join(map(split($PATHEXT, ';'), {_, v -> v[1:]}), '\|')
+    execute 'syntax match drvoFileExe /\c.\+\.\%('..s:pat..'\)$/ contained'
+    unlet s:pat
+endif
 
 " setup default color groups
 highlight default link drvoDirTrunk Directory
+highlight default link drvoFileRegular NONE
+highlight default link drvoFileArc Special
+highlight default link drvoFileBak Comment
+highlight default link drvoFileExe Macro
 highlight default link drvoMark IncSearch
 
 " reset all marks

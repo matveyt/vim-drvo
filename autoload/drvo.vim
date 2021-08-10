@@ -1,6 +1,6 @@
 " Vim drvo plugin
 " Maintainer:   matveyt
-" Last Change:  2021 May 03
+" Last Change:  2021 Aug 09
 " License:      https://unlicense.org
 " URL:          https://github.com/matveyt/vim-drvo
 
@@ -51,12 +51,6 @@ function s:get_drives() abort
         endwhile
     endif
     return l:result
-endfunction
-
-" Check if case matters in file names
-function s:ignore_case() abort
-    "BUG: Neovim has always :set nofileignorecase
-    return &fileignorecase || has('win32')
 endfunction
 
 " drop '.' and '..' out of {items}
@@ -173,7 +167,6 @@ endfunction
 
 " Make syntax to match arglist
 function! drvo#mark() abort
-    let l:case = s:ignore_case() ? '\c' : '\C'
     syntax clear drvoMark
     for l:name in map(argv(), {_, v -> fnamemodify(v, ':p')})
         let l:tail = fnamemodify(l:name, ':t')
@@ -188,8 +181,8 @@ function! drvo#mark() abort
         let l:head = fnamemodify(l:head, ':p')
         " match tail if preceded by head and followed by slash (for dirs)
         execute printf('syntax match drvoMark %s/\V%s\%%(\^%s\)\@%d<=%s%s\$/ contained',
-            \ l:isdir ? 'nextgroup=drvoLastSlash ' : '', l:case, escape(l:head, '\/'),
-            \ strlen(l:head), l:tail, l:isdir ? '\ze\[\/]' : '')
+            \ l:isdir ? 'nextgroup=drvoLastSlash ' : '', &fileignorecase ? '\c' : '\C',
+            \ escape(l:head, '\/'), strlen(l:head), l:tail, l:isdir ? '\ze\[\/]' : '')
     endfor
 endfunction
 
@@ -199,9 +192,8 @@ function! drvo#prettify() abort
     silent! noautocmd lcd .
 
     " sort directories first; then sort files by extension
-    let l:case = s:ignore_case() ? 'i' : ''
-    execute 'sort' l:case '/^.*[\/]/'
-    execute 'sort' l:case '/\.[^.\/]\+$/r'
+    execute printf('sort %s /^.*[\/]/', &fileignorecase ? 'i' : '')
+    execute printf('sort %s /\.[^.\/]\+$/r', &fileignorecase ? 'i' : '')
 
     " remember altbuf
     let l:altbuf = bufnr(0)
