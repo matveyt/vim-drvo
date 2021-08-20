@@ -1,6 +1,6 @@
 " Vim drvo plugin
 " Maintainer:   matveyt
-" Last Change:  2021 Aug 09
+" Last Change:  2021 Aug 20
 " License:      https://unlicense.org
 " URL:          https://github.com/matveyt/vim-drvo
 
@@ -113,6 +113,7 @@ endfunction
 
 " Open List of items
 function! drvo#enter(items, ...) abort
+    let l:altbuf = get(w:, 'drvo_altbuf', bufnr())
     let l:dir = get(a:, 1)
     if l:dir is# 'h'
         let [l:cmd, l:split] = ['leftabove vnew', v:true]
@@ -125,14 +126,13 @@ function! drvo#enter(items, ...) abort
     else
         let [l:cmd, l:split] = ['vnew', v:false]
     endif
-    let l:alt = exists(':balt') == 2 && exists('w:drvo_altbuf') &&
-        \ !empty(bufname(w:drvo_altbuf)) ? '+balt\ #'..w:drvo_altbuf : ''
 
     if l:split
         let l:winid = win_getid()
         execute winnr(l:dir) != win_id2win(l:winid) ? 'wincmd '..l:dir : l:cmd
     endif
-    execute 'edit' l:alt fnameescape(s:chomp(a:items[0]))
+    execute 'edit' fnameescape(s:chomp(a:items[0]))
+    let @# = l:altbuf
     for l:item in reverse(a:items[1:])
         execute 'keepalt' l:cmd fnameescape(s:chomp(l:item))
         wincmd p

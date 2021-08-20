@@ -43,10 +43,7 @@ Alternate buffer~
 
 When traveling directory tree a lot, an |alternate-file| in the plugin's
 window gets lost very quickly. To deal with this Drvo tracks "the last known
-good" buffer in a dedicated |window-variable| called |w:drvo_altbuf|. A
-|:map-local| remapped <C-^> combo makes use of it whenever possible. Normally,
-you don't need to tackle with this, but you're free to read and modify
-|w:drvo_altbuf| as you wish.
+good" buffer in a dedicated |window-variable| called |w:drvo_altbuf|.
 
 ==============================================================================
 COMMANDS						       *drvo-commands*
@@ -88,7 +85,6 @@ O		Same as above, but split above
 o		Same as above, but split below
 <Tab>		Go to previous (last accessed) window |CTRL-W_CTRL-P|
 [count]<BS>	Go [count] levels up by the directory tree
-[count]<C-^>	Works as "normal" |Ctrl-^| but prefers |w:drvo_altbuf| if set
 =		|:lcd| to current buffer
 ~		Go |$HOME|
 .		Go to current working directory |getcwd()|
