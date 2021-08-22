@@ -140,14 +140,18 @@ drvo#readcmd({fmt})					      *drvo#readcmd()*
 
 drvo#sel_toggle({items})				   *drvo#sel_toggle()*
 
-  "Xor" |arglist| with new {items} List. Note all names in {items} List must
-  be fully expanded first.
+  "Xor" |arglist| with new {items} List. All names in {items} List must be
+  fully expanded first.
 
 drvo#shdo({fmt}, {dir}, {items})				 *drvo#shdo()*
 
   Implements |:Shdo| command. {fmt} is the same as in |:Shdo|. {dir} is the
   new local directory |:lcd| to set. {items} is the file name List to dump
   (if it's |empty()| then |arglist| is used instead).
+
+drvo#slash()							*drvo#slash()*
+
+  Get path separator(s), i.e. '\/' or '/'.
 
 ==============================================================================
  vim:tw=78:ts=8:ft=help:norl:

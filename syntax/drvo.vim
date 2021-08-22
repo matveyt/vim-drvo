@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language:     vim-drvo plugin
 " Maintainer:   matveyt
-" Last Change:  2021 Aug 16
+" Last Change:  2021 Aug 22
 " License:      https://unlicense.org
 " URL:          https://github.com/matveyt/vim-drvo
 
@@ -13,34 +13,50 @@ let b:current_syntax = 'drvo'
 let s:save_cpo = &cpo
 set cpo&vim
 
-function s:glyph(ix) abort
-    return exists('g:drvo_glyph') ? 'cchar='..nr2char(g:drvo_glyph[a:ix]) : ''
-endfunction
+function s:synmatch(group, pat, opts, arg = v:null) abort
+    let l:arg = (type(a:arg) == v:t_list) ? join(a:arg, '\|') : a:arg
+    let l:case = &fileignorecase ? 'c' : 'C'
+    let l:slash = drvo#slash()
+    let l:pat = substitute(a:pat, '$\(\a\+\)', '\=eval(submatch(1))', 'g')
 
-function s:syncontained(group, pat) abort
-    if empty(a:pat)
-        return
-    endif
+    let l:cmd = printf('syntax match %s /%s/', a:group, l:pat)
+    for [l:key, l:value] in items(a:opts)
+        if !empty(l:value)
+            let l:cmd .= ' ' . l:key
+            if type(l:value) == v:t_string
+                let l:cmd .= '=' . l:value
+            endif
+        endif
+    endfor
 
-    let l:pat = type(a:pat) == v:t_string ? a:pat :
-        \ printf('\V\%%(%s\)\$', join(a:pat, '\|'))
-    execute printf('syntax match %s /.\+%s%s/ contained', a:group,
-        \ &fileignorecase ? '\c' : '\C', l:pat)
+    return execute(l:cmd)
 endfunction
 
 " drvoDir is {drvoDirRoot/}{drvoDirTrunk}{/}
-syntax match drvoDir /^.*[\/]$/ contains=drvoDirRoot
-execute 'syntax match drvoDirRoot nextgroup=drvoDirTrunk,drvoMark /^.*[\/]\ze./'
-    \ 'contained conceal' s:glyph(0)
-syntax match drvoDirTrunk nextgroup=drvoLastSlash /[^\/]\+/ contained
-syntax match drvoLastSlash /[\/]/ contained conceal
+call s:synmatch('drvoDir', '^.*[$slash]$', #{contains: 'drvoDirRoot'})
+call s:synmatch('drvoDirRoot', '^.*[$slash]\ze.', #{nextgroup: 'drvoDirTrunk,drvoMark',
+    \ contained: v:true, conceal: v:true, cchar: exists('g:drvo_glyph[0]') ?
+    \ nr2char(g:drvo_glyph[0]) : 0})
+call s:synmatch('drvoDirTrunk', '[^$slash]\+', #{nextgroup: 'drvoLastSlash',
+    \ contained: v:true})
+call s:synmatch('drvoLastSlash', '[$slash]', #{contained: v:true, conceal: v:true})
 " drvoFile is {drvoFileRoot/}{drvoFileXXX}
-syntax match drvoFile /^.*[^\/]$/ contains=drvoFileRoot
-execute 'syntax match drvoFileRoot nextgroup=drvoFileExecutable,drvoFileIgnore,'
-    \ 'drvoFileSuffixes,drvoMark /^.*[\/]/ contained conceal' s:glyph(1)
-call s:syncontained('drvoFileExecutable', split($PATHEXT, ';'))
-call s:syncontained('drvoFileIgnore', g:ft_ignore_pat)
-call s:syncontained('drvoFileSuffixes', split(&suffixes, ','))
+call s:synmatch('drvoFile', '^.*[^$slash]$', #{contains: 'drvoFileRoot'})
+call s:synmatch('drvoFileRoot', '^.*[$slash]', #{nextgroup:
+    \ 'drvoFileExecutable,drvoFileIgnore,drvoFileSuffixes,drvoMark', contained: v:true,
+    \ conceal: v:true, cchar: exists('g:drvo_glyph[1]') ? nr2char(g:drvo_glyph[1]) : 0})
+if !empty(getenv('PATHEXT'))
+    call s:synmatch('drvoFileExecutable', '.\+\$case\V\%($arg\)\$', #{contained: v:true},
+        \ split($PATHEXT, ';'))
+endif
+if !empty(get(g:, 'ft_ignore_pat'))
+    call s:synmatch('drvoFileIgnore', '.\+\$case$arg', #{contained: v:true},
+        \ g:ft_ignore_pat)
+endif
+if !empty(&suffixes)
+    call s:synmatch('drvoFileSuffixes', '.\+\$case\V\%($arg\)\$', #{contained: v:true},
+        \ split(&suffixes, ','))
+endif
 
 " default colors
 highlight default link drvoDirTrunk Directory

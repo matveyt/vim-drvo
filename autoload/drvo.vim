@@ -1,6 +1,6 @@
 " Vim drvo plugin
 " Maintainer:   matveyt
-" Last Change:  2021 Aug 20
+" Last Change:  2021 Aug 22
 " License:      https://unlicense.org
 " URL:          https://github.com/matveyt/vim-drvo
 
@@ -9,7 +9,7 @@ set cpo&vim
 
 " Remove trailing slash
 function s:chomp(name) abort
-    return a:name =~# '[\/]$' ? a:name[:-2] : a:name
+    return a:name =~# printf('[%s]$', drvo#slash()) ? a:name[:-2] : a:name
 endfunction
 
 " Convert file size to a printable string
@@ -180,9 +180,10 @@ function! drvo#mark() abort
         " make sure our head ends in a slash
         let l:head = fnamemodify(l:head, ':p')
         " match tail if preceded by head and followed by slash (for dirs)
-        execute printf('syntax match drvoMark %s/\V%s\%%(\^%s\)\@%d<=%s%s\$/ contained',
-            \ l:isdir ? 'nextgroup=drvoLastSlash ' : '', &fileignorecase ? '\c' : '\C',
-            \ escape(l:head, '\/'), strlen(l:head), l:tail, l:isdir ? '\ze\[\/]' : '')
+        execute printf('syntax match drvoMark %s/\V\%s\%%(\^%s\)\@%d<=%s%s\$/ contained',
+            \ l:isdir ? 'nextgroup=drvoLastSlash ' : '', &fileignorecase ? 'c' : 'C',
+            \ escape(l:head, '\/'), strlen(l:head), l:tail, l:isdir ? printf('\ze\[%s]',
+            \ drvo#slash()) : '')
     endfor
 endfunction
 
@@ -192,8 +193,8 @@ function! drvo#prettify() abort
     silent! noautocmd lcd .
 
     " sort directories first; then sort files by extension
-    execute printf('sort %s /^.*[\/]/', &fileignorecase ? 'i' : '')
-    execute printf('sort %s /\.[^.\/]\+$/r', &fileignorecase ? 'i' : '')
+    execute printf('sort %s /^.*[%s]/', &fileignorecase ? 'i' : '', drvo#slash())
+    execute printf('sort %s /\.[^.%s]\+$/r', &fileignorecase ? 'i' : '', drvo#slash())
 
     " remember altbuf
     let l:altbuf = bufnr(0)
@@ -256,6 +257,12 @@ function! drvo#shdo(fmt, dir, items) abort
             \ '\=fnamemodify(l:item, empty(submatch(1)) ? ":.:S" : submatch(1))', 'g'))
     endfor
     filetype detect
+endfunction
+
+" drvo#slash()
+" Get path separator(s), i.e. '\/' or '/'
+function! drvo#slash() abort
+    return exists('+shellslash') ? '\/' : '/'
 endfunction
 
 let &cpo = s:save_cpo
