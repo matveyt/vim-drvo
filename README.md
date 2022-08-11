@@ -3,18 +3,15 @@
 Drvo is a directory viewer for Vim originally inspired by
 [Dirvish](https://github.com/justinmk/vim-dirvish).
 
-### Installation
+#### Download and Install
 
-Using [minpac](https://github.com/k-takata/minpac):
-
-```vim
-call minpac#init()
-call minpac#add('matveyt/vim-drvo')
+```
+$ git clone https://github.com/matveyt/vim-drvo ~/.vim/pack/manual/start/vim-drvo
 ```
 
 ### Usage
 
-Type `:e.` to browse current directory. Also make sure to read `:help drvo`.
+Type `:e.` to browse the current directory. Also make sure to read `:help drvo.txt`.
 
 ### Screenshot
 
