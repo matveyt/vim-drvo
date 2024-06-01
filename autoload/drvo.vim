@@ -1,6 +1,6 @@
 " Vim drvo plugin
 " Maintainer:   matveyt
-" Last Change:  2021 Sep 01
+" Last Change:  2024 May 30
 " License:      https://unlicense.org
 " URL:          https://github.com/matveyt/vim-drvo
 
@@ -103,8 +103,8 @@ function! drvo#change_drive() abort
         endfunction
         " execute dialog
         if has('popupwin')
-            call popup_menu(l:drives, {'title': '[Change drive]', 'callback':
-                \ funcref('s:on_end_dialog')})
+            call popup_menu(l:drives,
+                \ #{title: '[Change drive]', callback: funcref('s:on_end_dialog')})
         else
             call s:on_end_dialog(0, confirm('Change drive', join(l:drives, "\n")))
         endif
@@ -217,9 +217,10 @@ function! drvo#readcmd(fmt) abort
 
     if empty(l:lines)
         echohl ErrorMsg | echo 'Cannot read a directory' | echohl None
-        let l:lines = fnamemodify(empty(@#) ? getcwd() : @#, ':p')
+        let l:lines = fnamemodify(@# ?? getcwd(), ':p')
     endif
 
+    setlocal modifiable
     silent call deletebufline('', 1, '$')
     call setline(1, l:lines)
     setfiletype drvo
@@ -253,9 +254,9 @@ function! drvo#shdo(fmt, dir, items) abort
     silent! lcd `=a:dir`
     call setline(1, '#!'..&shell)
     call setline(2, 'cd '..shellescape(getcwd()))
-    for l:item in (empty(a:items) ? argv() : a:items)
+    for l:item in (a:items ?? argv())
         call append('$', substitute(a:fmt, '{\([^}]*\)}',
-            \ '\=fnamemodify(l:item, empty(submatch(1)) ? ":.:S" : submatch(1))', 'g'))
+            \ '\=fnamemodify(l:item, submatch(1) ?? ":.:S")', 'g'))
     endfor
     filetype detect
 endfunction

@@ -1,7 +1,7 @@
 " Vim filetype file
 " Language:     vim-drvo plugin
 " Maintainer:   matveyt
-" Last Change:  2021 Aug 20
+" Last Change:  2024 May 30
 " License:      https://unlicense.org
 " URL:          https://github.com/matveyt/vim-drvo
 
@@ -22,16 +22,15 @@ let b:undo_ftplugin .= ' cocu< cole< cul< spell< wrap<'
 setlocal concealcursor=n conceallevel=2 cursorline nospell nowrap
 
 " create shell script with names from Visual selection (or arglist)
-command! -buffer -range -nargs=? -complete=shellcmd Shdo
-    \ call drvo#shdo(empty(<q-args>) ? '{}' : <q-args>, @%,
-        \ <range> ? getline(<line1>, <line2>) : v:null)
+command -buffer -range -nargs=? -complete=shellcmd Shdo
+    \ call drvo#shdo(<q-args> ?? '{}', @%, <range> ? getline(<line1>, <line2>) : v:null)
 " find file under @% directory
-command! -buffer -nargs=1 Findfile
-    \ call setloclist(0, [], 'r', {'lines': glob('%/**/'..<q-args>, v:false, v:true),
-        \ 'efm': '%f', 'title': 'Find file: '..<q-args>}) | lopen
+command -buffer -nargs=1 Findfile
+    \ call setloclist(0, [], 'r', #{lines: glob('%/**/'..<q-args>, v:false, v:true),
+        \ efm: '%f', title: 'Find file: '..<q-args>}) | lopen
 " select/deselect file mask
-command! -buffer -nargs=1 Selectfile $argadd <args> | call drvo#mark()
-command! -buffer -nargs=1 Deselectfile argdelete <args> | call drvo#mark()
+command -buffer -nargs=1 Selectfile $argadd <args> | call drvo#mark()
+command -buffer -nargs=1 Deselectfile argdelete <args> | call drvo#mark()
 
 " g? to show help
 nnoremap <buffer><silent>g? :help! drvo-mappings<CR>
